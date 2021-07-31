@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <TextView
+        android:id="@+id/text"
+        style="@style/TextAppearance.AppCompat.SearchResult.Subtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="middle"
+        android:maxLines="4"
+        android:minLines="3"
+        android:text="product selected you be ask to set target on the product  Type selection 1. select product if the item to be bought will used in the project and it will produces new product of same kind (maize seed will produces maize) 2. select consumable if item to buy will be use to finish or it is a service for the project 3. select tool if the item to buy will be used in the project but will still be useful after the project."
+        app:layout_constraintBottom_toTopOf="@+id/time"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
