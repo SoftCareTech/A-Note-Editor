@@ -70,7 +70,7 @@ class NoteModelFactory(
     private val resp: Repos
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(NoteModel::class.java)) {
+        if (modelClass.isAssignableFrom(NoteModel::class.java) ) {
             @Suppress("UNCHECKED_CAST")
             return NoteModel(resp) as T
         }

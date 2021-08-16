@@ -1,6 +1,5 @@
 package com.softcare.raphnote
 
-import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
@@ -8,7 +7,6 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ContentInfoCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.softcare.raphnote.databinding.ActivityEditBinding
@@ -67,11 +65,12 @@ open class EditActivity : AppCompatActivity(), View.OnClickListener {
                     }
                     is NoteModel.NoteUiState.Saving -> {
 
-                        Snackbar.make(binding.root,"Saving",Snackbar.LENGTH_INDEFINITE)
+                        Snackbar.make(binding.root,"Saving",Snackbar.LENGTH_INDEFINITE).show()
                     }
                     is NoteModel.NoteUiState.Error -> {
-  Snackbar.make(binding.root,it.message,Snackbar.LENGTH_INDEFINITE)
+  Snackbar.make(binding.root,it.message,Snackbar.LENGTH_INDEFINITE).show()
                     }
+                    NoteModel.NoteUiState.Opening -> { Snackbar.make(binding.root,"Opening",Snackbar.LENGTH_INDEFINITE).show()}
                 }
             }
         }
@@ -89,7 +88,7 @@ open class EditActivity : AppCompatActivity(), View.OnClickListener {
     override fun onBackPressed() {
         if(exit)super.onBackPressed()
     }
-    fun exitNote() {
+    private fun exitNote() {
             val title = "Exit "
             val message = "You are leaving edit mode. Will like to save changes"
             val button1String = "No"
@@ -101,9 +100,9 @@ open class EditActivity : AppCompatActivity(), View.OnClickListener {
                 button1String,
                 { dialog, arg1 -> exit()})
             ad.setNegativeButton(
-                button2String,
-                { dialog, arg1 -> save() })
-            ad.show()
+                button2String
+            ) { dialog, arg1 -> save() }
+        ad.show()
 
     }
   private  var exit=false

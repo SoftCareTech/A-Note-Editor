@@ -2,27 +2,37 @@ package com.softcare.raphnote
 
 import android.app.Activity
 import android.content.*
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.provider.DocumentsContract
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.BackgroundColorSpan
+import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.viewModelScope
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.softcare.raphnote.databinding.FragmentNoteViewBinding
 import com.softcare.raphnote.db.NoteApp
 import com.softcare.raphnote.db.Schema
 import com.softcare.raphnote.model.ChangeObserver
 import com.softcare.raphnote.model.Note
+import com.softcare.raphnote.model.NoteModel
+import com.softcare.raphnote.model.NoteModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -31,7 +41,9 @@ import java.io.File
  * A simple [Fragment] subclass as the second destination in the navigation.
  */
 class NoteViewFragment : Fragment() , View.OnTouchListener {
-
+    private val viewModel: NoteModel by viewModels {
+        NoteModelFactory((activity?.application as NoteApp).repository)
+    }
 
     private var id = 0L
     private var time = 0L
@@ -46,17 +58,78 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentNoteViewBinding.inflate(inflater, container, false)
-        binding.text.setText(arguments?.getString("text", "text"))
-        binding.time.setText(arguments?.getLong("time")?.let { Schema().getTime(it) })
-        arguments?.getLong("time")?.let { time = it }
-        arguments?.getLong("id")?.let { id = it }
+       // binding.text.setText(arguments?.getString("text", "text"))
+      //  binding.time.setText(arguments?.getLong("time")?.let { Schema().getTime(it) })
+        //arguments?.getLong("time")?.let { time = it }
+       // arguments?.getLong("id")?.let { id = it }
         binding.text.setOnTouchListener(this)
+
+        id = arguments?.getLong("id", 0L)!!
+        if(id==0L) {
+            val  path=arguments?.getString("path")
+            if(path!=null){
+                viewModel.openFile(path)
+            } else
+                binding.text.text=arguments?.getString("text")
+        }
+        else viewModel.openNote(id)
+
+
+        lifecycleScope.launchWhenStarted {
+            viewModel.noteUiState.collect {
+                val any = when (it) {
+
+                    is NoteModel.NoteUiState.NoteOpened -> {
+                        binding.text.text = it.note.text
+                        binding.time.text=Schema().getTime(it.note.time)
+                           time = it.note.time
+                          id = it.note.id
+                    }
+                    is NoteModel.NoteUiState.FileOpened -> {
+                        binding.text.setText(it.text)
+                    }
+
+                    is NoteModel.NoteUiState.Error -> {
+                        Snackbar.make(binding.root, it.message, Snackbar.LENGTH_INDEFINITE).show()
+                    }
+                    else -> { Snackbar.make(binding.root, "Unknow Error", Snackbar.LENGTH_INDEFINITE).show()
+                    }
+                }
+            }
+        }
+
+
+
         return binding.root
 
     }
 
-    private fun searchInText(text: TextView, query: String?) {
-        Snackbar.make(text, "Searching  for $query not implemented yet", Snackbar.LENGTH_LONG)
+    private fun searchInText(textView: TextView, query: String) {
+      /*  val WordtoSpan: Spannable = SpannableString("partial colored text")
+        WordtoSpan.setSpan(
+            ForegroundColorSpan(Color.BLUE),
+            2,
+            4,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        textView.text = WordtoSpan*/
+        val tvt: String = textView.text.toString()
+        var ofe: Int = tvt.indexOf(query, 0)
+        val wordToSpan: Spannable = SpannableString(textView.text)
+        var ofs = 0
+        while (ofs < tvt.length && ofe != -1){
+            ofs = ofe + 1
+            ofe = tvt.indexOf(query, ofs);
+            if (ofe == -1)
+                break;
+            else {
+                // set color here
+                wordToSpan.setSpan(BackgroundColorSpan(Color.GREEN), ofe, ofe + query.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                textView.setText(wordToSpan, TextView.BufferType.SPANNABLE);
+            }
+
+        }
+        Snackbar.make(textView, "Searching  for $query not implemented yet", Snackbar.LENGTH_LONG)
             .show()
     }
 
@@ -65,7 +138,7 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
 
         (activity as MainActivity?)!!.changeMenu(changeObserver = object : ChangeObserver {
             override fun searchText(query: String?) {
-                searchInText(binding.text, query)
+                query?.let { searchInText(binding.text, it) }
             }
 
             override fun optionMenu(menuId: Int): Boolean {
@@ -173,8 +246,8 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
     private fun exportToFile(){
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
-            type = "application/pdf"
-            putExtra(Intent.EXTRA_TITLE, "invoice.pdf")
+            type = "text/*"
+            putExtra(Intent.EXTRA_TITLE, "RaphNote.txt")
 
             // Optionally, specify a URI for the directory that should be opened in
             // the system file picker before your app creates the document.

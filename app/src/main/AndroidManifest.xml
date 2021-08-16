@@ -3,18 +3,16 @@
     package="com.softcare.raphnote">
 
   <application
+      android:name=".db.NoteApp"
       android:allowBackup="true"
-      android:icon="@mipmap/ic_launcher"
+      android:icon="@drawable/a_note_w"
       android:label="@string/app_name"
-      android:roundIcon="@mipmap/ic_launcher_round"
+      android:roundIcon="@drawable/a_note_w"
       android:supportsRtl="true"
       android:theme="@style/Theme.RaphNote">
-    <activity android:name=".EditActivity"  android:windowSoftInputMode="adjustResize">
-
-    </activity>
-    <activity android:name=".SettingsActivity"></activity>
-
-    <activity android:name=".StartActivity"></activity>
+    <activity android:name=".EditActivity"  android:windowSoftInputMode="adjustResize">  </activity>
+    <activity android:name=".SettingsActivity" />
+    <activity android:name=".StartActivity" />
     <activity
         android:name=".MainActivity"
         android:label="@string/app_name"

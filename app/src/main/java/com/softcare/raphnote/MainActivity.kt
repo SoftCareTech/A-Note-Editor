@@ -99,12 +99,14 @@ class MainActivity : AppCompatActivity() ,SearchView.OnQueryTextListener
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
-        if(!isList ) changeObserver.searchNotes(orderAscending,column ,query)
+        if(isList ) changeObserver.searchNotes(orderAscending,column ,query)
+        else changeObserver.searchText(query)
  return true
     }
 
     override fun onQueryTextChange(newText: String?): Boolean {
         if(isList)changeObserver.searchNotes(orderAscending,column ,newText)
+        else changeObserver.searchText(newText)
         return true
     }
     lateinit var changeObserver:ChangeObserver
