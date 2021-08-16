@@ -1,0 +1,41 @@
+<resources>
+
+    <!-- sort Preference -->
+    <string-array name="sort_entries">
+        <item>Date created</item>
+        <item>Date modified</item>
+    </string-array>
+    <string-array name="sort_values"><!--schema bind values -->
+        <item>id</item>
+        <item>last_edited</item>
+    </string-array>
+
+
+    <!-- order Preference -->
+    <string-array name="orderby_entries">
+        <item>Ascending</item>
+        <item>Descending</item>
+    </string-array>
+    <string-array name="orderby_values"><!--schema bind values -->
+        <item>ASC</item>
+        <item>DESC</item>
+    </string-array>
+
+    <string-array name="email_addresses">
+        <item>raphaelraymondproduct@gmail.com</item>
+    </string-array>
+
+    <string-array name="lock_time_entries">
+        <item>1 minute</item>
+        <item>2 minutes</item>
+        <item>5 minutes</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="lock_time_values">
+        <item>1</item>
+        <item>2</item>
+        <item>5</item>
+        <item>0</item>
+    </string-array>
+
+</resources>

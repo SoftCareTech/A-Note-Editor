@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.softcare.raphnote.R
+import com.softcare.raphnote.db.Schema
 import com.softcare.raphnote.model.ClickObserver
 import com.softcare.raphnote.model.Note
 import java.util.*
@@ -24,10 +25,10 @@ class NoteAdapter(var context: Context?, var clickObserver: ClickObserver?) :  R
     }
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
-        holder.time.text = noteList[position].time.toString()
+        holder.time.text = Schema().getTime(noteList[position].time)
         holder.text.text = noteList[position].text
         holder.root.setOnClickListener(View.OnClickListener {
-              clickObserver?.click(noteList[position].id)
+              clickObserver?.click(noteList[position].id,noteList[position].time,noteList[position].text)
         })
     }
 
@@ -39,14 +40,12 @@ class NoteAdapter(var context: Context?, var clickObserver: ClickObserver?) :  R
     }
 
     override fun getItemCount(): Int {
-        return if (this.noteList != null) {
-            noteList.size
-        } else 0
+         return    noteList.size
     }
 
     class NoteViewHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
-        val time :TextView
+        val time: TextView
         val text: TextView
         val root: ConstraintLayout
         init {

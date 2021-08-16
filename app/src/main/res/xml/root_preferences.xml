@@ -1,0 +1,32 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+<!--
+        <ListPreference
+            android:entries="@array/orderby_entries"
+            android:entryValues="@array/orderby_values"
+            android:key="order_by"
+            android:title="@string/order_by"
+            app:defaultValue="DESC"
+            />
+        <ListPreference
+            android:entries="@array/sort_entries"
+            android:entryValues="@array/sort_values"
+            android:key="sort_by"
+            android:title="@string/sort_by"
+            app:defaultValue="last_edited"
+            app:useSimpleSummaryProvider="true" />
+
+    <SwitchPreferenceCompat
+        app:key="lock"
+        app:title="@string/lock_title" />
+    <ListPreference
+        app:defaultValue="10"
+        app:dependency="lock"
+        app:entries="@array/lock_time_entries"
+        app:entryValues="@array/lock_time_values"
+        app:key="lock_time"
+        app:title="@string/lock_time_title"
+        app:useSimpleSummaryProvider="true" />
+        -->
+</PreferenceScreen>
