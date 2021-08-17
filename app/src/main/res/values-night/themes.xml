@@ -14,4 +14,10 @@
         <!-- Customize your theme here. -->
         <item name="android:windowBackground"> @color/purple_500</item>
     </style>
+
+    <style name="Start">
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:background">@drawable/a_note_w</item>
+    </style>
 </resources>

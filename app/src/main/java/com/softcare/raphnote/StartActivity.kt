@@ -3,14 +3,8 @@ package com.softcare.raphnote
 import android.content.Intent
 import android.hardware.biometrics.BiometricManager
 import android.hardware.biometrics.BiometricPrompt
+
 import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import android.os.PersistableBundle
-import android.provider.Settings
-import android.util.Log
-import android.widget.Button
-import android.widget.Toast
-import androidx.core.content.ContextCompat
 import java.util.concurrent.Executor
 
 class StartActivity : AppCompatActivity() {

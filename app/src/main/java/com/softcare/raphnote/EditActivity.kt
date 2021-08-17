@@ -12,15 +12,15 @@ import com.google.android.material.snackbar.Snackbar
 import com.softcare.raphnote.databinding.ActivityEditBinding
 import com.softcare.raphnote.db.NoteApp
 import com.softcare.raphnote.model.Note
-import com.softcare.raphnote.model.NoteModel
-import com.softcare.raphnote.model.NoteModelFactory
+import com.softcare.raphnote.model.NoteEditModel
+import com.softcare.raphnote.model.NoteEditModelFactory
 import kotlinx.coroutines.flow.collect
 
 
 open class EditActivity : AppCompatActivity(), View.OnClickListener {
     var id = 0L
-    private val viewModel: NoteModel by viewModels {
-        NoteModelFactory((application as NoteApp).repository)
+    private val viewModel: NoteEditModel by viewModels {
+        NoteEditModelFactory((application as NoteApp).repository)
     }
 
     private lateinit var binding: ActivityEditBinding
@@ -42,35 +42,35 @@ open class EditActivity : AppCompatActivity(), View.OnClickListener {
         lifecycleScope.launchWhenStarted {
             viewModel.noteUiState.collect {
                 when (it) {
-                    is NoteModel.NoteUiState.Empty -> {
+                    is NoteEditModel.NoteUiState.Empty -> {
 
                     }
-                    is NoteModel.NoteUiState.NoteOpened-> {
+                    is NoteEditModel.NoteUiState.NoteOpened-> {
                         binding.textEdit.setText(it.note.text)
                     }
-                    is NoteModel.NoteUiState.FileOpened-> {
+                    is NoteEditModel.NoteUiState.FileOpened-> {
                         binding.textEdit.setText(it.text)
                     }
-                    is NoteModel.NoteUiState.Saved -> {
+                    is NoteEditModel.NoteUiState.Saved -> {
                         val s: SharedPreferences = getSharedPreferences(
                             "RaphNote",
                             MODE_PRIVATE
                         )
                        if( s.getBoolean("save_then_exit",true)){
-                           Toast.makeText(this@EditActivity,"save",Toast.LENGTH_LONG).show()
+                           Toast.makeText(this@EditActivity,getString(R.string.saved),Toast.LENGTH_LONG).show()
                            exit()
                        }  else
-                        Snackbar.make(binding.root,"Saved",Snackbar.LENGTH_LONG).show()
+                        Snackbar.make(binding.root,getString(R.string.saved),Snackbar.LENGTH_LONG).show()
 
                     }
-                    is NoteModel.NoteUiState.Saving -> {
+                    is NoteEditModel.NoteUiState.Saving -> {
 
-                        Snackbar.make(binding.root,"Saving",Snackbar.LENGTH_INDEFINITE).show()
+                        Snackbar.make(binding.root,getString(R.string.saving),Snackbar.LENGTH_INDEFINITE).show()
                     }
-                    is NoteModel.NoteUiState.Error -> {
+                    is NoteEditModel.NoteUiState.Error -> {
   Snackbar.make(binding.root,it.message,Snackbar.LENGTH_INDEFINITE).show()
                     }
-                    NoteModel.NoteUiState.Opening -> { Snackbar.make(binding.root,"Opening",Snackbar.LENGTH_INDEFINITE).show()}
+                    NoteEditModel.NoteUiState.Opening -> { Snackbar.make(binding.root,getString(R.string.opening),Snackbar.LENGTH_INDEFINITE).show()}
                 }
             }
         }
@@ -89,10 +89,10 @@ open class EditActivity : AppCompatActivity(), View.OnClickListener {
         if(exit)super.onBackPressed()
     }
     private fun exitNote() {
-            val title = "Exit "
-            val message = "You are leaving edit mode. Will like to save changes"
-            val button1String = "No"
-            val button2String = "Yes"
+            val title = getString(R.string.exit_editing)
+            val message = getString(R.string.exit_edit_msg)
+        val button1String = getString(R.string.yes)
+        val button2String = getString(R.string.no)
             val ad: AlertDialog.Builder = AlertDialog.Builder(this)
             ad.setTitle(title)
             ad.setMessage(message)

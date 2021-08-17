@@ -12,7 +12,7 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 
-class NoteModel (private val resp: Repos) : ViewModel() {
+class NoteEditModel (private val resp: Repos) : ViewModel() {
     private val _noteUiState = MutableStateFlow<NoteUiState>(NoteUiState.Empty)
     val noteUiState: StateFlow<NoteUiState> = _noteUiState
     private val _note = MutableStateFlow<Note>(Note(0,0,""))
@@ -66,13 +66,13 @@ class NoteModel (private val resp: Repos) : ViewModel() {
 }}
 
 
-class NoteModelFactory(
+class NoteEditModelFactory(
     private val resp: Repos
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(NoteModel::class.java) ) {
+        if (modelClass.isAssignableFrom(NoteEditModel::class.java) ) {
             @Suppress("UNCHECKED_CAST")
-            return NoteModel(resp) as T
+            return NoteEditModel(resp) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

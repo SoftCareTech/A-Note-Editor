@@ -171,7 +171,7 @@ class NoteListFragment : Fragment() {
         val sendIntent: Intent = Intent().apply {
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=com.softcare.raphnote")
-            type = "text/plain"
+            type = "text/*"
             // (Optional) Here we're setting the title of the content
             putExtra(Intent.EXTRA_TITLE, "Share to")
             // (Optional) Here we're passing a content URI to an image to be displayed

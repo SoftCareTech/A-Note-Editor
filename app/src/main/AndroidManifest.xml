@@ -10,9 +10,12 @@
       android:roundIcon="@drawable/a_note_w"
       android:supportsRtl="true"
       android:theme="@style/Theme.RaphNote">
-    <activity android:name=".EditActivity"  android:windowSoftInputMode="adjustResize">  </activity>
+    <activity  android:theme="@style/Theme.RaphNote.NoActionBar"
+        android:name=".EditActivity"
+        android:windowSoftInputMode="stateAlwaysVisible">
+    </activity>
     <activity android:name=".SettingsActivity" />
-    <activity android:name=".StartActivity" />
+    <activity   android:theme="@style/Start" android:name=".StartActivity" />
     <activity
         android:name=".MainActivity"
         android:label="@string/app_name"

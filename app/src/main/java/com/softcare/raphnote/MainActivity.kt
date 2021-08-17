@@ -115,10 +115,24 @@ class MainActivity : AppCompatActivity() ,SearchView.OnQueryTextListener
     fun changeMenu( changeObserver: ChangeObserver, isList:Boolean){
         this.changeObserver=changeObserver
         this.isList=isList
-        if( findViewById<FloatingActionButton>(R.id.add_note)!=null)
-        if( isList)
-           findViewById<FloatingActionButton>(  R.id.add_note  ).setImageDrawable(resources.getDrawable(R.drawable.ic_baseline_add_24))
-        else findViewById<FloatingActionButton>(R.id.add_note).setImageDrawable(resources.getDrawable(R.drawable.ic_baseline_edit_24))
+        val fab=findViewById<FloatingActionButton>(R.id.add_note)
+        if( fab!=null)
+        if( isList) {
+          fab.setImageDrawable(
+                resources.getDrawable(
+                    R.drawable.ic_baseline_add_24
+                )
+            )
+            fab.contentDescription=getString(R.string.create_note)
+
+        } else {
+            findViewById<FloatingActionButton>(R.id.add_note).setImageDrawable(
+                resources.getDrawable(
+                    R.drawable.ic_baseline_edit_24
+                )
+            )
+            fab.contentDescription=getString(R.string.edit_note)
+        }
         invalidateOptionsMenu()
        }
 

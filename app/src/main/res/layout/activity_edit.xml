@@ -11,7 +11,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="start|top"
-        android:hint="type here"
+        android:hint="@string/type_here"
         android:inputType="textMultiLine"
         android:background="@android:color/transparent"
         android:minLines="10"
@@ -20,7 +20,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:layout_constraintVertical_weight="2" />
+        app:layout_constraintVertical_weight="2"
+        android:autofillHints="@string/type_here" />
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -40,7 +41,8 @@
         app:layout_constraintBottom_toBottomOf="@+id/back"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/back"
-        app:srcCompat="@drawable/ic_baseline_check_24" />
+        app:srcCompat="@drawable/ic_baseline_check_24"
+        android:contentDescription="@string/save" />
 
     <ImageView
         android:id="@+id/back"
@@ -51,6 +53,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/toolbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_baseline_arrow_back_ios_24" />
+        app:srcCompat="@drawable/ic_baseline_arrow_back_ios_24"
+        android:contentDescription="@string/back" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
