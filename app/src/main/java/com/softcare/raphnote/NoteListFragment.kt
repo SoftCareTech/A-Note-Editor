@@ -175,8 +175,8 @@ class NoteListFragment : Fragment() {
             // (Optional) Here we're setting the title of the content
             putExtra(Intent.EXTRA_TITLE, "Share to")
             // (Optional) Here we're passing a content URI to an image to be displayed
-            data = contentUri
-            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            //data = contentUri
+           // flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
         }
         val shareIntent = Intent.createChooser(sendIntent, "Share with")
         startActivity(shareIntent)

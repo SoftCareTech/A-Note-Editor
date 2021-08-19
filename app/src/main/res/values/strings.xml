@@ -75,4 +75,9 @@ Functions available in Settings
 
 
 </string>
+    <string name="opened">Opened</string>
+    <string name="prompt_info_title">Unlock App</string>
+    <string name="prompt_info_subtitle">"Unlock with finger "</string>
+    <string name="prompt_info_description">Use biomatric to see your notes. You can disable this in settings of this app. by setting lock after to \"never\"</string>
+    <string name="prompt_info_use_app_password">Use pasword or pattern</string>
 </resources>

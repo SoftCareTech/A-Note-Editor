@@ -55,6 +55,7 @@ class NoteViewModel (private val resp: Repos) : ViewModel() {
           try {
               _noteUiState.value =  NoteUiState.Exporting
               val file = File(path)
+              file.createNewFile()
               file.writeText(text, Charsets.UTF_32)
               _noteUiState.value =  NoteUiState.Exported(file.absolutePath)
           } catch (e:Exception){

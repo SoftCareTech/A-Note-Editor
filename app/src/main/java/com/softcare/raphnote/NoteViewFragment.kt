@@ -1,12 +1,15 @@
 package com.softcare.raphnote
 
+import android.Manifest
 import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
@@ -19,6 +22,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -61,18 +65,7 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
       //  binding.time.setText(arguments?.getLong("time")?.let { Schema().getTime(it) })
         //arguments?.getLong("time")?.let { time = it }
        // arguments?.getLong("id")?.let { id = it }
-        binding.text.setOnTouchListener(this)
-        id = arguments?.getLong("id", 0L)!!
-        if(id==0L) {
-            val  path=arguments?.getString("path")
-            if(path!=null){
-                viewModel.openFile(path)
-            } else {
-                binding.text.text = arguments?.getString("text")
-                arguments?.getLong("time")?.let { time = it }
-            }
-        }
-        else viewModel.openNote(id)
+        binding.text.setOnTouchListener(this) 
 
 
         lifecycleScope.launchWhenStarted {
@@ -87,6 +80,7 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
                     }
                     is NoteViewModel.NoteUiState.FileOpened -> {
                         binding.text.text=it.text
+                        Snackbar.make(binding.root, getString(R.string.opened), Snackbar.LENGTH_LONG).show()
                     }
 
                     is NoteViewModel.NoteUiState.Error -> {
@@ -140,7 +134,7 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
                 // set color here
                 wordToSpan.setSpan( //ForegroundColorSpan(Color.BLUE)
                      BackgroundColorSpan(Color.GRAY)
-                    , ofe, ofe + query.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    , ofs, ofe + query.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                 textView.setText(wordToSpan, TextView.BufferType.SPANNABLE)
             }
 
@@ -168,7 +162,7 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
                         deleteNote()
                     }
                     R.id.action_share_text -> {
-                        shareText(binding.text.toString())
+                        shareText(binding.text.text.toString())
                     }
                     else -> return false
                 }
@@ -234,13 +228,13 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
         val contentUri= Uri.parse("android.resource://com.softcare.raphnote/drawable/image_name")
         val sendIntent: Intent = Intent().apply {
             action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_TEXT, text)
             type = "text/*"
+            putExtra(Intent.EXTRA_TEXT, text)
             // (Optional) Here we're setting the title of the content
             putExtra(Intent.EXTRA_TITLE, "Send to")
             // (Optional) Here we're passing a content URI to an image to be displayed
-            data = contentUri
-            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            //data = contentUri
+           // flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
         }
         val shareIntent = Intent.createChooser(sendIntent, "Share with")
         startActivity(shareIntent)
@@ -258,34 +252,46 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
         }
     }
     private fun exportToFile(){
-        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "text/*"
-            putExtra(Intent.EXTRA_TITLE, getString(R.string.default_save_name))
+     val permissions= arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        context?.let { if(hasPermissions(it, permissions = permissions) ){
 
-            // Optionally, specify a URI for the directory that should be opened in
-            // the system file picker before your app creates the document.
-            // putExtra(DocumentsContract.EXTRA_INITIAL_URI, null)
+            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "text/*"
+                putExtra(Intent.EXTRA_TITLE, getString(R.string.default_save_name))
+
+                // Optionally, specify a URI for the directory that should be opened in
+                // the system file picker before your app creates the document.
+                // putExtra(DocumentsContract.EXTRA_INITIAL_URI, null)
+            }
+            resultLauncher.launch(intent)
+        }else{
+            Snackbar.make(binding.root,"Please accept storage access permission to proceed", Snackbar.LENGTH_LONG).show()
+            activity?.let { it1 -> ActivityCompat.requestPermissions(it1, permissions, 1) };
+
         }
-        resultLauncher.launch(intent)
+        }
     }
 
 
+    override fun onResume() {
+        super.onResume()
+        startNote()
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+private  fun  startNote(){
+    id = arguments?.getLong("id", 0L)!!
+    if(id!=0L) {
+        val  path=arguments?.getString("path")
+        if(path!=null){
+            viewModel.openFile(path)
+        } else {
+            binding.text.text = arguments?.getString("text")
+            arguments?.getLong("time")?.let { time = it }
+        }
+    }
+    else viewModel.openNote(id)
+}
 
 
 
@@ -337,6 +343,22 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
         event?.let { onTouchEvent(it) }
         return false
+    }
+
+    //
+
+
+   fun  hasPermissions(context:Context, permissions:Array<String> ) :Boolean{
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+            && context != null && permissions != null) {
+            for (permission in permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) !=
+                    PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
 
