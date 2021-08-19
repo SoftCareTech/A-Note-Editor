@@ -3,6 +3,7 @@ package com.softcare.raphnote
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
@@ -19,35 +20,38 @@ class StartActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_start)
         executor = ContextCompat.getMainExecutor(this)
+
         biometricPrompt = BiometricPrompt(this, executor,  object : BiometricPrompt.AuthenticationCallback() {
-                override fun onAuthenticationError(errorCode: Int,  errString: CharSequence) {
-                    super.onAuthenticationError(errorCode, errString)
-                   // Toast.makeText(applicationContext, "Authentication error: $errString", Toast.LENGTH_SHORT)   .show()
-                }
+            override fun onAuthenticationError(errorCode: Int,  errString: CharSequence) {
+                super.onAuthenticationError(errorCode, errString)
+               Toast.makeText(applicationContext, "Authentication error: $errString", Toast.LENGTH_SHORT)   .show()
+            }
 
-                override fun onAuthenticationSucceeded(
-                    result: BiometricPrompt.AuthenticationResult) {
-                    super.onAuthenticationSucceeded(result)
-                    startActivity( Intent(applicationContext,MainActivity::class.java))
-                   // Toast.makeText(applicationContext, "Authentication succeeded!", Toast.LENGTH_SHORT)  .show()
+            override fun onAuthenticationSucceeded(
+                result: BiometricPrompt.AuthenticationResult) {
+                super.onAuthenticationSucceeded(result)
+                startActivity( Intent(applicationContext,MainActivity::class.java))
+                Toast.makeText(applicationContext, "Authentication succeeded!", Toast.LENGTH_SHORT)  .show()
 
-                }
+            }
 
-                override fun onAuthenticationFailed() {
-                    super.onAuthenticationFailed()
-                   // Toast.makeText(applicationContext, "Authentication failed",  Toast.LENGTH_SHORT)   .show()
-                }
-            })
+            override fun onAuthenticationFailed() {
+                super.onAuthenticationFailed()
+                Toast.makeText(applicationContext, "Authentication failed",  Toast.LENGTH_SHORT)   .show()
+            }
+        })
 
-        promptInfo = BiometricPrompt.PromptInfo.Builder().apply {
-            setTitle("getString(R.string.prompt_info_title)")
-            setSubtitle("getString(R.string.prompt_info_subtitle)")
-             setDescription("getString(R.string.prompt_info_description)")
-            setConfirmationRequired(false)
-           // setAllowedAuthenticators(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
+        promptInfo = BiometricPrompt.PromptInfo.Builder().
+            setTitle("getString(R.string.prompt_info_title)").
+            setSubtitle("getString(R.string.prompt_info_subtitle)").
+            setDescription("getString(R.string.prompt_info_description)").
+            setConfirmationRequired(false).
+            // setAllowedAuthenticators(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
             setNegativeButtonText("getString(R.string.prompt_info_use_app_password)") //don't use it together with setAllowedAuthenticators(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
-        }.build()
-            biometricPrompt.authenticate(promptInfo)
+        .build()
+
+
+
            // startActivity( Intent(applicationContext,MainActivity::class.java))
     }
     /*
@@ -135,14 +139,20 @@ class StartActivity : AppCompatActivity() {
     }
 */
 
-
+public fun  clik(v: View){
+    try {
+        biometricPrompt.authenticate(promptInfo)
+    }catch(e:Exception){
+        e.printStackTrace()
+        startActivity( Intent(applicationContext,MainActivity::class.java))
+    }
+}
 
     // Since we are using the same methods in more than one Activity, better give them their own file.
 
-    object BiometricPromptUtils {
+   /* object BiometricPromptUtils {
         private const val TAG = "BiometricPromptUtils"
-        fun createBiometricPrompt(
-            activity: AppCompatActivity,
+        fun createBiometricPrompt(  activity: AppCompatActivity,
             processSuccess: (BiometricPrompt.AuthenticationResult) -> Unit
         ): BiometricPrompt {
             val executor = ContextCompat.getMainExecutor(activity)
@@ -177,4 +187,6 @@ class StartActivity : AppCompatActivity() {
                 setNegativeButtonText(activity.getString(R.string.prompt_info_use_app_password))
             }.build()
     }
+
+    */
     }

@@ -112,33 +112,18 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
     }
 
     private fun searchInText(textView: TextView, query: String) {
-      /*  val WordtoSpan: Spannable = SpannableString("partial colored text")
-        WordtoSpan.setSpan(
-            ForegroundColorSpan(Color.BLUE),
-            2,
-            4,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-        textView.text = WordtoSpan*/
-        textView.text=textView.text.toString()
+        textView.text=textView.text.toString()//refresh search
         val tvt: String = textView.text.toString()
-        var ofe: Int = tvt.indexOf(query, 0)
+        var ofs: Int = tvt.indexOf(query, 0)
         val wordToSpan: Spannable = SpannableString(textView.text)
-        var ofs = 0
-        while (ofs < tvt.length && ofe != -1){
-            ofs = ofe + 1
-            ofe = tvt.indexOf(query, ofs)
-            if (ofe == -1)
-                break
-            else {
-                // set color here
-                wordToSpan.setSpan( //ForegroundColorSpan(Color.BLUE)
-                     BackgroundColorSpan(Color.GRAY)
-                    , ofs, ofe + query.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                textView.setText(wordToSpan, TextView.BufferType.SPANNABLE)
-            }
-
-        }
+        var ofe = ofs+query.length
+        while (ofs < tvt.length && ofs != -1&&ofe<tvt.length){
+            wordToSpan.setSpan( BackgroundColorSpan(Color.GRAY), ofs, ofe ,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            textView.setText(wordToSpan, TextView.BufferType.SPANNABLE)
+            ofs = tvt.indexOf(query, ofe)
+            ofe = ofs+query.length
+                     }
 
     }
 
