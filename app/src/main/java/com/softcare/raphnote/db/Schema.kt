@@ -6,7 +6,7 @@ import java.util.*
 
 
 class Schema {
-
+          val tag="RaphNote"
     object Note {
         const val ID = "id" // creation time
         const val TIME = "time" //creation time

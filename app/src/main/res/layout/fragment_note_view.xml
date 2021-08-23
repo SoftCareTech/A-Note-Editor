@@ -43,6 +43,7 @@
             android:textIsSelectable="true"
             android:textSize="16sp"
             android:typeface="normal"
+            android:autoLink="all"
             tools:text="@string/large_text" />
     </ScrollView>
 

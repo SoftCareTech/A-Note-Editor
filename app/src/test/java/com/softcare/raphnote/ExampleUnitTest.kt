@@ -1,4 +1,4 @@
-package com.example.raphnote
+package com.softcare.raphnote
 
 import org.junit.Test
 

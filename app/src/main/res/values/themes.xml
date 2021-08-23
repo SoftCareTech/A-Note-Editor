@@ -19,11 +19,10 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="Start">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <item name="android:background">@drawable/a_note_g</item>
+    <style name="StartLogo" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@drawable/start_splash</item>
     </style>
+
 
     <style name="Theme.RaphNote.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 

@@ -11,9 +11,12 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.text.Html
 import android.text.Spannable
 import android.text.SpannableString
+import android.text.Spanned
 import android.text.style.BackgroundColorSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -26,6 +29,7 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.snackbar.Snackbar
 import com.softcare.raphnote.databinding.FragmentNoteViewBinding
 import com.softcare.raphnote.db.NoteApp
@@ -71,68 +75,67 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
         lifecycleScope.launchWhenStarted {
             viewModel.noteUiState.collect {
                 when (it) {
-
                     is NoteViewModel.NoteUiState.NoteOpened -> {
                         binding.text.text = it.note.text
                         binding.time.text=Schema().getTime(it.note.time)
                            time = it.note.time
                           id = it.note.id
+                        Log.d(Schema().tag,"Note opened "+it.javaClass.simpleName)
+
                     }
                     is NoteViewModel.NoteUiState.FileOpened -> {
                         binding.text.text=it.text
                         Snackbar.make(binding.root, getString(R.string.opened), Snackbar.LENGTH_LONG).show()
+                        Log.d(Schema().tag,"File opened "+it.javaClass.simpleName)
+
                     }
 
                     is NoteViewModel.NoteUiState.Error -> {
                         Snackbar.make(binding.root, it.message, Snackbar.LENGTH_INDEFINITE).show()
                     }
-                    NoteViewModel.NoteUiState.Empty -> {}
-                    NoteViewModel.NoteUiState.Opening -> {
-                        Snackbar.make(binding.root, getString(R.string.opening), Snackbar.LENGTH_INDEFINITE).show()
+                  is  NoteViewModel.NoteUiState.Empty -> {}
+
+                  is  NoteViewModel.NoteUiState.Opening -> {
+                        Snackbar.make(binding.root, getString(R.string.opening), Snackbar.LENGTH_SHORT).show()
                     }
-                    NoteViewModel.NoteUiState.Deleting -> {
+                  is  NoteViewModel.NoteUiState.Deleting -> {
                         Snackbar.make(binding.root, getString(R.string.deleting), Snackbar.LENGTH_INDEFINITE).show()
                     }
                     is NoteViewModel.NoteUiState.Exported -> {
                         Snackbar.make(binding.root, getString(R.string.exported_to)+" "+it.path, Snackbar.LENGTH_LONG).show()
+                        Log.d(Schema().tag,"Note Exported "+it.javaClass.simpleName)
+
                     }
-                    NoteViewModel.NoteUiState.Exporting -> {
+                   is NoteViewModel.NoteUiState.Exporting -> {
                         Snackbar.make(binding.root, getString(R.string.exporting), Snackbar.LENGTH_INDEFINITE).show()
                     }
-                    NoteViewModel.NoteUiState.NoteDeleted -> {
+                  is  NoteViewModel.NoteUiState.NoteDeleted -> {
                         Toast.makeText(context, getString(R.string.note_deleted), Toast.LENGTH_LONG).show()
+                      Log.d(Schema().tag,"Note deleted "+it.javaClass.simpleName)
+                      NavHostFragment.findNavController(this@NoteViewFragment).navigate(
+                          R.id.action_ListNotesTo_ViewNote    )
+                    }
+
+                    else -> { Toast.makeText(context, "unknown action", Toast.LENGTH_LONG).show()
+                        Log.e(Schema().tag,"unknown action occured "+it.javaClass.simpleName)
 
                     }
                 }  }   }
-
-
 
         return binding.root
 
     }
 
-    private fun searchInText(textView: TextView, query: String) {
-        textView.text=textView.text.toString()//refresh search
-        val tvt: String = textView.text.toString()
-        var ofs: Int = tvt.indexOf(query, 0)
-        val wordToSpan: Spannable = SpannableString(textView.text)
-        var ofe = ofs+query.length
-        while (ofs < tvt.length && ofs != -1&&ofe<tvt.length){
-            wordToSpan.setSpan( BackgroundColorSpan(Color.GRAY), ofs, ofe ,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            textView.setText(wordToSpan, TextView.BufferType.SPANNABLE)
-            ofs = tvt.indexOf(query, ofe)
-            ofe = ofs+query.length
-                     }
 
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         (activity as MainActivity?)!!.changeMenu(changeObserver = object : ChangeObserver {
+
             override fun searchText(query: String?) {
-                query?.let { searchInText(binding.text, it) }
+                query?.let {
+                    searchInText(binding.text, it) }
             }
 
             override fun optionMenu(menuId: Int): Boolean {
@@ -173,7 +176,23 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
 
 
     }
+    fun searchInText(textView: TextView, query: String)   {
 
+        textView.text = textView.text.toString()//refresh search
+        val tvt: String = textView.text.toString()
+        var ofs: Int = tvt.indexOf(query, 0)
+        val wordToSpan: Spannable = SpannableString(textView.text)
+        var ofe = ofs + query.length
+        while (ofs < tvt.length && ofs != -1 && ofe < tvt.length) {
+            wordToSpan.setSpan(
+                BackgroundColorSpan(Color.GRAY), ofs, ofe,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            textView.setText(wordToSpan, TextView.BufferType.SPANNABLE)
+            ofs = tvt.indexOf(query, ofe)
+            ofe = ofs + query.length
+        }
+    }
   private  fun copyToClipboard(text: String) {
         val clipboard = context?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("", text)
@@ -190,14 +209,13 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
             val button2String = getString(R.string.no)
             val ad: AlertDialog.Builder = AlertDialog.Builder(it)
             ad.setTitle(title)
-            ad.setCancelable(false)
             ad.setMessage(message)
             ad.setPositiveButton(
                 button1String,
-                { dialog, arg1 -> })
+                { dialog, arg1 -> deleting()  })
             ad.setNegativeButton(
                 button2String,
-                { dialog, arg1 ->viewModel.deleteNote() })
+                { dialog, arg1 -> })
             ad.show()
         }
     }
@@ -208,6 +226,13 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
 
         }    }
     */
+    private  fun deleting(){
+    if(id!=0L)
+    viewModel.deleteNote(id) else{
+        Snackbar.make(binding.root, getString(R.string.note_not_exist), Snackbar.LENGTH_LONG).show()
+
+    }
+    }
     fun shareText(text:String){
         //https://play.google.com/store/apps/details?id=com.softcare.raphnote
         val contentUri= Uri.parse("android.resource://com.softcare.raphnote/drawable/image_name")
@@ -224,24 +249,13 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
         val shareIntent = Intent.createChooser(sendIntent, "Share with")
         startActivity(shareIntent)
     }
-    private var resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            // There are no request codes
-            val data: Intent? = result.data
-            if(data!=null)
-                data.data?.path?.let {viewModel.exportToFile(it,binding.text.toString()) }
-            else context?.let {
-                Snackbar.make(binding.root,
-                    it.getString(R.string.error_occurred), Snackbar.LENGTH_LONG).show()
-            }
-        }
-    }
+
     private fun exportToFile(){
      val permissions= arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         context?.let { if(hasPermissions(it, permissions = permissions) ){
 
             val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                addCategory(Intent.CATEGORY_OPENABLE)
+               addCategory(Intent.CATEGORY_OPENABLE)
                 type = "text/*"
                 putExtra(Intent.EXTRA_TITLE, getString(R.string.default_save_name))
 
@@ -258,6 +272,57 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
         }
     }
 
+    val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            // There are no request codes
+            val data: Intent? = result.data
+            if(data!=null)
+                data.data?.also {
+                    // open file intent
+                    context?.contentResolver?.openOutputStream(it)?.let { it1 ->
+                        viewModel.exportText(  it1,binding.text.text.toString() )
+                    }
+                    }
+            else context?.let {
+                Snackbar.make(binding.root,
+                    it.getString(R.string.error_occurred), Snackbar.LENGTH_LONG).show()
+            }
+        }
+    }
+
+
+    fun openFile() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "text/*"
+        }
+
+        openFileLauncher.launch(intent)
+    }
+
+    val openFileLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                // There are no request codes
+                val data: Intent? = result.data
+                if (data != null)
+                    data.data?.also {
+                        // open file intent
+                        context?.contentResolver?.openInputStream(it)?.let { it1 ->
+                            viewModel.openFile(
+                                it1
+                            )
+                        }
+
+                    }
+                else context?.let {
+                    Snackbar.make(
+                        binding.root,
+                        it.getString(R.string.error_occurred), Snackbar.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
 
     override fun onResume() {
         super.onResume()
@@ -266,16 +331,27 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
 
 private  fun  startNote(){
     id = arguments?.getLong("id", 0L)!!
-    if(id!=0L) {
-        val  path=arguments?.getString("path")
-        if(path!=null){
-            viewModel.openFile(path)
+    if(id==0L) {
+        val  isFile=arguments?.getBoolean("openFile")
+        if(isFile == true){
+           arguments?.putBoolean("openFile",false)
+            try {
+              openFile()
+            }catch (e: Exception){
+                context?.let {
+                    Snackbar.make(binding.root,
+                        it.getString(R.string.error_occurred)+" "+e.localizedMessage, Snackbar.LENGTH_LONG).show()
+                }
+            }
+
         } else {
-            binding.text.text = arguments?.getString("text")
-            arguments?.getLong("time")?.let { time = it }
+            val sendText=   arguments?.getString("text")
+            if(sendText!=null&&sendText.isNotEmpty()&&sendText.isNullOrBlank()) {
+                binding.text.text = sendText
+                arguments?.getLong("time")?.let { time = it }
+            }
         }
-    }
-    else viewModel.openNote(id)
+    }  else viewModel.openNote(id)
 }
 
 
@@ -346,5 +422,41 @@ private  fun  startNote(){
         return true;
     }
 
+    fun setTitlebols(fullText: String, searchText: String?): Spanned? {
+        var fullText = fullText
+        var searchText = searchText
+        var span: Spanned?
+        searchText = searchText!!.replace("'", "")
+        searchText = searchText.replace("?", "")
+        val words = searchText.split(" ")
 
+        // highlight search text
+        if (null != searchText && searchText.isNotEmpty()) {
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    for (wr in words) {
+                        fullText = fullText.replace(
+                            "(?i)($wr)",
+                            "<span><b><strong><font>$1</font></strong></b></span>"
+                        )
+                    }
+                    span = Html.fromHtml(fullText, Html.FROM_HTML_MODE_LEGACY)
+                    //                    , TextView.BufferType.SPANNABLE
+                } else {
+                    for (wr in words) {
+                        fullText = fullText.replace(
+                            "(?i)($wr)",
+                            "<b><big>$1</font></big></b>"
+                        )
+                    }
+                    span = Html.fromHtml(fullText)
+                }
+            } catch (e: Exception) {
+                span = Html.fromHtml(fullText)
+            }
+        } else {
+            span = Html.fromHtml(fullText)
+        }
+        return span
+    }
 }

@@ -1,192 +1,153 @@
 package com.softcare.raphnote
 
+import android.app.Activity
 import android.content.Intent
+import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
-import android.util.Log
-import android.view.View
+import android.provider.Settings
+import android.provider.Settings.ACTION_BIOMETRIC_ENROLL
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
-import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricManager.Authenticators.*
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
+import com.google.android.material.snackbar.Snackbar
 import java.util.concurrent.Executor
 
 class StartActivity : AppCompatActivity() {
     private lateinit var executor: Executor
     private lateinit var biometricPrompt: BiometricPrompt
   private lateinit var promptInfo: BiometricPrompt.PromptInfo
+  val allowedAuthenticators:Int =BIOMETRIC_STRONG or BIOMETRIC_WEAK or DEVICE_CREDENTIAL
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_start)
         executor = ContextCompat.getMainExecutor(this)
 
-        biometricPrompt = BiometricPrompt(this, executor,  object : BiometricPrompt.AuthenticationCallback() {
-            override fun onAuthenticationError(errorCode: Int,  errString: CharSequence) {
-                super.onAuthenticationError(errorCode, errString)
-               Toast.makeText(applicationContext, "Authentication error: $errString", Toast.LENGTH_SHORT)   .show()
-            }
+        biometricPrompt =
+            BiometricPrompt(this, executor, object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                    super.onAuthenticationError(errorCode, errString)
 
-            override fun onAuthenticationSucceeded(
-                result: BiometricPrompt.AuthenticationResult) {
-                super.onAuthenticationSucceeded(result)
-                startActivity( Intent(applicationContext,MainActivity::class.java))
-                Toast.makeText(applicationContext, "Authentication succeeded!", Toast.LENGTH_SHORT)  .show()
-
-            }
-
-            override fun onAuthenticationFailed() {
-                super.onAuthenticationFailed()
-                Toast.makeText(applicationContext, "Authentication failed",  Toast.LENGTH_SHORT)   .show()
-            }
-        })
-
-        promptInfo = BiometricPrompt.PromptInfo.Builder().
-            setTitle("getString(R.string.prompt_info_title)").
-            setSubtitle("getString(R.string.prompt_info_subtitle)").
-            setDescription("getString(R.string.prompt_info_description)").
-            setConfirmationRequired(false).
-            // setAllowedAuthenticators(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
-            setNegativeButtonText("getString(R.string.prompt_info_use_app_password)") //don't use it together with setAllowedAuthenticators(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
-        .build()
-
-
-
-           // startActivity( Intent(applicationContext,MainActivity::class.java))
-    }
-    /*
-      fun onCreate2(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_start)
-        private lateinit var executor: Executor
-        private lateinit var biometricPrompt: BiometricPrompt
-        private lateinit var promptInfo: BiometricPrompt.PromptInfo
-
-        override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
-            setContentView(R.layout.activity_login)
-            executor = ContextCompat.getMainExecutor(this)
-            biometricPrompt = BiometricPrompt(this, executor,
-                object : BiometricPrompt.AuthenticationCallback() {
-                    override fun onAuthenticationError(errorCode: Int,
-                                                       errString: CharSequence) {
-                        super.onAuthenticationError(errorCode, errString)
-                        Toast.makeText(applicationContext,
-                            "Authentication error: $errString", Toast.LENGTH_SHORT)
-                            .show()
-                    }
-
-                    override fun onAuthenticationSucceeded(
-                        result: BiometricPrompt.AuthenticationResult) {
-                        super.onAuthenticationSucceeded(result)
-                        Toast.makeText(applicationContext,
-                            "Authentication succeeded!", Toast.LENGTH_SHORT)
-                            .show()
-                    }
-
-                    override fun onAuthenticationFailed() {
-                        super.onAuthenticationFailed()
-                        Toast.makeText(applicationContext, "Authentication failed",
-                            Toast.LENGTH_SHORT)
-                            .show()
-                    }
-                })
-
-            promptInfo = BiometricPrompt.PromptInfo.Builder()
-                .setTitle("Biometric login for my app")
-                .setSubtitle("Log in using your biometric credential")
-                .setNegativeButtonText("Use account password")
-                .build()
-
-            // Prompt appears when user clicks "Log in".
-            // Consider integrating with the keystore to unlock cryptographic operations,
-            // if needed by your app.
-            val biometricLoginButton =
-                findViewById<Button>(R.id.biometric_login)
-            biometricLoginButton.setOnClickListener {
-                biometricPrompt.authenticate(promptInfo)
-            }
-        }
-        promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle("Biometric login for my app")
-            .setSubtitle("Log in using your biometric credential")
-            // Can't call setNegativeButtonText() and
-            // setAllowedAuthenticators(... or DEVICE_CREDENTIAL) at the same time.
-            // .setNegativeButtonText("Use account password")
-            .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
-            .build()
-
-        val biometricManager = BiometricManager.from(this)
-        when (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)) {
-            BiometricManager.BIOMETRIC_SUCCESS -> {
-                Log.d("MY_APP_TAG", "App can authenticate using biometrics.")
-            }
-            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE ->
-                Log.e("MY_APP_TAG", "No biometric features available on this device.")
-            BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE ->
-                Log.e("MY_APP_TAG", "Biometric features are currently unavailable.")
-            BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
-                // Prompts the user to create credentials that your app accepts.
-                val enrollIntent = Intent(Settings.ACTION_BIOMETRIC_ENROLL).apply {
-                    putExtra(
-                        Settings.EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED,
-                        BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL
-                    )
                 }
-                startActivityForResult(enrollIntent, 0)
-            }
-        }
-    }
-*/
 
-public fun  clik(v: View){
-    try {
-        biometricPrompt.authenticate(promptInfo)
-    }catch(e:Exception){
-        e.printStackTrace()
-        startActivity( Intent(applicationContext,MainActivity::class.java))
-    }
-}
-
-    // Since we are using the same methods in more than one Activity, better give them their own file.
-
-   /* object BiometricPromptUtils {
-        private const val TAG = "BiometricPromptUtils"
-        fun createBiometricPrompt(  activity: AppCompatActivity,
-            processSuccess: (BiometricPrompt.AuthenticationResult) -> Unit
-        ): BiometricPrompt {
-            val executor = ContextCompat.getMainExecutor(activity)
-
-            val callback = object : BiometricPrompt.AuthenticationCallback() {
-
-                override fun onAuthenticationError(errCode: Int, errString: CharSequence) {
-                    super.onAuthenticationError(errCode, errString)
-                    Log.d(TAG, "errCode is $errCode and errString is: $errString")
-                }
+                override fun onAuthenticationSucceeded(
+                    result: BiometricPrompt.AuthenticationResult
+                ) {
+                    super.onAuthenticationSucceeded(result)
+                    startActivity(Intent(applicationContext, MainActivity::class.java))
+                    finish()
+                                    }
 
                 override fun onAuthenticationFailed() {
                     super.onAuthenticationFailed()
-                    Log.d(TAG, "User biometric rejected. ")
                 }
+            })
 
-                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                    super.onAuthenticationSucceeded(result)
-                    Log.d(TAG, "Authentication was successful")
-                    processSuccess(result)
+        promptInfo =
+            BiometricPrompt.PromptInfo.Builder()
+                .apply {
+                    setTitle(getString(R.string.prompt_info_title))
+                        setSubtitle(getString(R.string.prompt_info_subtitle))
+                        setDescription(getString(R.string.prompt_info_description))
+                        setConfirmationRequired(false)
+                    setAllowedAuthenticators(allowedAuthenticators )
+                    if(allowedAuthenticators and DEVICE_CREDENTIAL==0)
+                    setNegativeButtonText(getString(R.string.prompt_info_use_app_password)) //don't use it together with setAllowedAuthenticators(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
+
+                }
+            .build()
+        val s: SharedPreferences = this.getSharedPreferences(
+            "RaphNote",
+            MODE_PRIVATE
+        )
+       if( s.getInt("lockAfter",0)!=3) {
+           when (BiometricManager.from(this).canAuthenticate(allowedAuthenticators)) {
+               BiometricManager.BIOMETRIC_SUCCESS -> biometricPrompt.authenticate(promptInfo)
+               BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> notEnrol()
+               else -> {
+                   disableLock()
+                   Toast.makeText(
+                       applicationContext,
+                       "The phone have no security",
+                       Toast.LENGTH_SHORT
+                   ).show()
+               }
+           }
+       }
+  else{
+           startActivity(Intent(applicationContext, MainActivity::class.java))
+           Toast.makeText(
+               applicationContext,
+               "App Security disabled. You can enable it in the App Settings",
+               Toast.LENGTH_SHORT).show()
+           finish()
+
+       }
+
+    }
+
+    private fun notEnrol() {
+        val title = getString(R.string.bio_en_title)
+        val message = getString(R.string.bio_en_msg)
+        val button1String = getString(R.string.yes)
+        val button2String = getString(R.string.no)
+        val ad: AlertDialog.Builder = AlertDialog.Builder(this)
+        ad.setTitle(title)
+        ad.setMessage(message)
+        ad.setPositiveButton(
+            button1String,
+            { dialog, arg1 -> launchSettings() })
+        ad.setNegativeButton(
+            button2String
+        ) { dialog, arg1 ->  disableLock() }
+        ad.show()
+
+    }
+private  fun  disableLock(){
+    val s: SharedPreferences = this.getSharedPreferences(
+        "RaphNote",
+        MODE_PRIVATE
+    )
+    val editor = s.edit()
+    editor.putInt("lockAfter", 3)  // 3 is never
+    editor.apply()
+    editor.commit()
+    startActivity(Intent(applicationContext, MainActivity::class.java))
+    finish()
+}
+
+    private  fun launchSettings(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        val enrollIntent =
+            Intent(ACTION_BIOMETRIC_ENROLL).apply {
+                putExtra( Settings.EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED,
+                    BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL
+                )
+            }
+            var resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    // There are no request codes
+                    val data: Intent? = result.data
+                    startActivity(Intent(applicationContext, MainActivity::class.java))
+                    finish()
                 }
             }
-            return BiometricPrompt(activity, executor, callback)
+
+            resultLauncher.launch(enrollIntent)
+        } else {
+            val title = getString(R.string.settings_error)
+            val message = getString(R.string.settings_error_msg)
+            val ad: AlertDialog.Builder = AlertDialog.Builder(this)
+            ad.setTitle(title)
+            ad.setMessage(message)
+            ad.show()
         }
 
-        fun createPromptInfo(activity: AppCompatActivity): BiometricPrompt.PromptInfo =
-            BiometricPrompt.PromptInfo.Builder().apply {
-                setTitle(activity.getString(R.string.prompt_info_title))
-                setSubtitle(activity.getString(R.string.prompt_info_subtitle))
-                setDescription(activity.getString(R.string.prompt_info_description))
-                setConfirmationRequired(false)
-                setNegativeButtonText(activity.getString(R.string.prompt_info_use_app_password))
-            }.build()
     }
 
-    */
-    }
+}

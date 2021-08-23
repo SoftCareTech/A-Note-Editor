@@ -78,6 +78,11 @@ Functions available in Settings
     <string name="opened">Opened</string>
     <string name="prompt_info_title">Unlock App</string>
     <string name="prompt_info_subtitle">"Unlock with finger "</string>
-    <string name="prompt_info_description">Use biomatric to see your notes. You can disable this in settings of this app. by setting lock after to \"never\"</string>
-    <string name="prompt_info_use_app_password">Use pasword or pattern</string>
+    <string name="prompt_info_description">Use biometric to see your notes. You can disable this in settings of this app. by setting lock after to \"never\"</string>
+    <string name="prompt_info_use_app_password">Use password or pattern</string>
+    <string name="bio_en_title">Securiy Error</string>
+    <string name="bio_en_msg">Hello, you are not using any security on your phone, our security depends on phone security.  Do you want to enable security?</string>
+    <string name="settings_error_msg">"Unable to open Settings automatically to enable security. Please do it manually phone settings.  "</string>
+    <string name="settings_error">Settings error</string>
+    <string name="note_not_exist">Note  does not exist in note list. Please note file cannot be deleted here, go to file manager</string>
 </resources>

@@ -19,7 +19,9 @@
         android:name="com.softcare.raphnote.NoteViewFragment"
         android:label="View Note"
         tools:layout="@layout/fragment_note_view">
-
+        <action
+            android:id="@+id/action_ListNoteViewToNoteList"
+            app:destination="@id/NoteListFragment" />
     </fragment>
 
 </navigation>

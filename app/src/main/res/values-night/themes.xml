@@ -15,9 +15,7 @@
         <item name="android:windowBackground"> @color/purple_500</item>
     </style>
 
-    <style name="Start">
-        <item name="android:windowActionBar">false</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:background">@drawable/a_note_w</item>
+    <style name="StartLogo" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:windowBackground">@drawable/start_splash_night</item>
     </style>
 </resources>

@@ -3,8 +3,7 @@
     package="com.softcare.raphnote">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
-
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <application
         android:name=".db.NoteApp"
         android:allowBackup="true"
@@ -14,15 +13,23 @@
         android:roundIcon="@drawable/a_note_w"
         android:supportsRtl="true"
         android:theme="@style/Theme.RaphNote">
-
+        <activity android:name="com.softcare.raphnote.AppGuide"
+            android:label="App Guide" />
         <activity
             android:name=".EditActivity"
             android:theme="@style/Theme.RaphNote.NoActionBar"
-            android:windowSoftInputMode="stateUnchanged"/>
+            android:windowSoftInputMode="stateUnchanged">
+            <intent-filter>
+            <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="text/plain"/>
+            </intent-filter>
+        </activity>
         <activity android:name=".SettingsActivity" />
+
         <activity
             android:name=".StartActivity"
-            android:theme="@style/Theme.RaphNote.NoActionBar">
+            android:theme="@style/StartLogo">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

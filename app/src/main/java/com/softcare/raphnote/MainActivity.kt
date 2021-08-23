@@ -16,6 +16,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.app.ShareCompat.IntentReader.from
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.hardware.fingerprint.FingerprintManagerCompat.from
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -106,9 +107,10 @@ class MainActivity : AppCompatActivity() ,SearchView.OnQueryTextListener
 
     override fun onQueryTextChange(newText: String?): Boolean {
         if(isList)changeObserver.searchNotes(orderAscending,column ,newText)
-        else changeObserver.searchText(newText)
+      else changeObserver.searchText(newText)
         return true
     }
+
     lateinit var changeObserver:ChangeObserver
             var isList= true;
 
@@ -119,17 +121,15 @@ class MainActivity : AppCompatActivity() ,SearchView.OnQueryTextListener
         if( fab!=null)
         if( isList) {
           fab.setImageDrawable(
-                resources.getDrawable(
-                    R.drawable.ic_baseline_add_24
+              ResourcesCompat.getDrawable( resources,
+                    R.drawable.ic_baseline_add_24, null
                 )
             )
             fab.contentDescription=getString(R.string.create_note)
 
         } else {
-            findViewById<FloatingActionButton>(R.id.add_note).setImageDrawable(
-                resources.getDrawable(
-                    R.drawable.ic_baseline_edit_24
-                )
+           fab.setImageDrawable(
+               ResourcesCompat.getDrawable( resources,  R.drawable.ic_baseline_edit_24,null  )
             )
             fab.contentDescription=getString(R.string.edit_note)
         }

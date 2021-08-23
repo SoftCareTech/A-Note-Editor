@@ -10,18 +10,19 @@
         android:id="@+id/text_edit"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:autofillHints="@string/type_here"
+        android:background="@android:color/transparent"
         android:gravity="start|top"
         android:hint="@string/type_here"
         android:inputType="textMultiLine"
-        android:background="@android:color/transparent"
         android:minLines="10"
         android:paddingLeft="@dimen/fab_margin"
         android:paddingRight="@dimen/fab_margin"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:layout_constraintVertical_weight="2"
-        android:autofillHints="@string/type_here" />
+        app:layout_constraintVertical_weight="2" />
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"

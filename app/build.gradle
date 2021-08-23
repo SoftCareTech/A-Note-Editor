@@ -39,8 +39,12 @@ android {
         cleanedAnnotations
     }
 }
+repositories {
+    maven { url "https://jitpack.io" }
+}
 dependencies {
  implementation 'androidx.biometric:biometric:1.1.0'
+    implementation 'com.github.AppIntro:AppIntro:6.1.0'
     def room_version="2.3.0"
 
 // Room

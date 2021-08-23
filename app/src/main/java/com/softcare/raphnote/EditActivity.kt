@@ -1,5 +1,6 @@
 package com.softcare.raphnote
 
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
@@ -28,13 +29,21 @@ open class EditActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         binding = ActivityEditBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         id = intent.getLongExtra("id", 0L)
         if(id==0L) {
-           val  path=intent.getStringExtra("path")
-            if(path!=null){
-                viewModel.openFile(path)
-            } else
-            binding.textEdit.setText(intent.getStringExtra("text"))
+            val textReceived = intent.getStringExtra(Intent.EXTRA_TEXT)
+
+            if (textReceived!=null){
+                binding.textEdit.setText(textReceived)
+            } else {
+
+                val path = intent.getStringExtra("path")
+                if (path != null) {
+                    viewModel.openFile(path)
+                } else
+                    binding.textEdit.setText(intent.getStringExtra("text"))
+            }
         }
         else viewModel.openNote(id)
         binding.back.setOnClickListener(this)
@@ -98,10 +107,10 @@ open class EditActivity : AppCompatActivity(), View.OnClickListener {
             ad.setMessage(message)
             ad.setPositiveButton(
                 button1String,
-                { dialog, arg1 -> exit()})
+                { dialog, arg1 -> save() })
             ad.setNegativeButton(
                 button2String
-            ) { dialog, arg1 -> save() }
+            ) { dialog, arg1 ->  exit() }
         ad.show()
 
     }
