@@ -20,7 +20,7 @@
         android:label="View Note"
         tools:layout="@layout/fragment_note_view">
         <action
-            android:id="@+id/action_ListNoteViewToNoteList"
+            android:id="@+id/action_NoteViewToNoteList"
             app:destination="@id/NoteListFragment" />
     </fragment>
 

@@ -32,7 +32,7 @@ class NoteListModel(private val repo: Repos) : ViewModel() {
             if (ascending)
                 _noteList.value = repo.getNotesSearchASC(query, orderColumn)
             else
-                _noteList.value = repo.getNotesSearchASC(query, orderColumn)
+                _noteList.value = repo.getNotesSearchDESC(query, orderColumn)
         }
 
     sealed class NoteUiState {

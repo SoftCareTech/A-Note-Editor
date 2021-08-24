@@ -1,5 +1,6 @@
 package com.softcare.raphnote
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -8,18 +9,18 @@ import com.github.appintro.*
 
 /// AppIntro2() //AppIntro is shipped with two top-level layouts that you can use. The default layout (AppIntro) has textual buttons, while the alternative layout has buttons with icons.
 class AppGuide : AppIntro() {
+    @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         // Make sure you don't call setContentView!
-
         // Call addSlide passing your Fragments.
         // You can use AppIntroFragment to use a pre-built fragment
         addSlide(
             AppIntroFragment.newInstance(
                 imageDrawable = R.drawable.a_note_w_small,
-                title = "Welcome to \" A Note Editor \" ",
-                description = "You can allays come to this guide by selecting help in option menu of Notes List.",
+                title = "Welcome to 'A Note Editor'",
+                description = "You can always come to this guide by selecting" +
+                        " App Guide in options menu of Note List.",
                 titleColor = Color.YELLOW,
                 descriptionColor = Color.WHITE,
                 backgroundColor = Color.DKGRAY,
@@ -28,11 +29,11 @@ class AppGuide : AppIntro() {
         )
         addSlide(
             AppIntroFragment.newInstance(
-                imageDrawable = R.drawable.a_note_w_small,
-                title = "Notes (main view)",
+                imageDrawable = R.drawable.a_note_w_small,  // note_list with option menu
+                title = "Notes List (main view)",
                 description = "Click on plus sign  to add note. " +
-                        " Click on a on note to  read  note. " +
-                        "Click on search to search for not that contain the search type word",
+                        "Click on a note to  read. " +
+                        "Click on search to search for not that contain the search type word. Click on three vertical dot(Option menu) for more options",
                 titleColor = Color.YELLOW,
                 descriptionColor = Color.WHITE,
                 backgroundColor = Color.MAGENTA
@@ -46,8 +47,8 @@ class AppGuide : AppIntro() {
             description = "Click on pen sign  to edit note. "
                     +"Search for a word in a note. " +
                     "Share note as text. "+
-                    "Copy note as text. "+
-                    "Delete note. " ,
+                    "Copy note as text. Export note as text file"+
+                    "Delete note." ,
                     titleColor = Color.YELLOW,
             descriptionColor = Color.WHITE,
             backgroundColor = Color.DKGRAY
@@ -57,7 +58,7 @@ class AppGuide : AppIntro() {
             imageDrawable = R.drawable.a_note_w_small,
             title = "Editing mode",
             description = "Click to right check to save and exit editing mode. " +
-                    " Click on a on top left check to stop editing(you will ask if you want to save changes. ",
+                    "Click on a on top left icon to stop editing(you will ask if you want to save changes. ",
             titleColor = Color.YELLOW,
             descriptionColor = Color.WHITE,
             backgroundColor = Color.MAGENTA
@@ -66,11 +67,11 @@ class AppGuide : AppIntro() {
         addSlide(
         AppIntroFragment.newInstance(
             imageDrawable = R.drawable.a_note_w_small,
-            title = "Note List option menu",
-            description = "Search for a note in a notes. " +
-                    "Share the App link to others. "+
-                    "Help is see App guide.  "+
-                    " Settings for security, sorting, and ordering .  " ,
+            title = "Note List -->options menu",
+            description =    "Share the App link to others. " +
+                    "Open File to open a text file in reading mode."+
+                    "Help is see App guide. "+
+                    "Settings for security, sorting and ordering." ,
             titleColor = Color.YELLOW,
             descriptionColor = Color.WHITE,
             backgroundColor = Color.DKGRAY
@@ -91,7 +92,7 @@ class AppGuide : AppIntro() {
         addSlide(
         AppIntroFragment.newInstance(
             imageDrawable = R.drawable.a_note_w_small,
-            title = "Creste note from other apps",
+            title = "Create note from other apps",
             description = "Select text in chrome or any ohter app the click share in the app. " +
                     "List of app will be prompt to you. "+
                     "Select 'A Note Editor' then it will take you to editing mode " +
@@ -103,7 +104,16 @@ class AppGuide : AppIntro() {
 
 
 
-
+        addSlide(
+            AppIntroFragment.newInstance(
+                imageDrawable = R.drawable.a_note_w_small,
+                title = ".... Let get started",
+                description = "You can always reach us at raphaelraymondproduct@gmail.com." +
+                        "Don't forget to send us feedback at above contact us. "  ,
+                titleColor = Color.YELLOW,
+                descriptionColor = Color.WHITE,
+                backgroundColor = Color.MAGENTA
+            ))
 
 
 

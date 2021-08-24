@@ -14,18 +14,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.RaphNote">
         <activity android:name="com.softcare.raphnote.AppGuide"
-            android:label="App Guide" />
+            android:label="@string/app_guide" />
         <activity
             android:name=".EditActivity"
             android:theme="@style/Theme.RaphNote.NoActionBar"
-            android:windowSoftInputMode="stateUnchanged">
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
             <action android:name="android.intent.action.SEND"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <data android:mimeType="text/plain"/>
             </intent-filter>
         </activity>
-        <activity android:name=".SettingsActivity" />
+        <activity android:name=".SettingsActivity"
+            android:label="@string/action_settings"/>
 
         <activity
             android:name=".StartActivity"

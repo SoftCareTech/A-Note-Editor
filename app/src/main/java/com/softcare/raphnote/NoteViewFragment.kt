@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.Html
@@ -22,7 +21,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
@@ -38,6 +36,9 @@ import com.softcare.raphnote.model.ChangeObserver
 import com.softcare.raphnote.model.NoteViewModel
 import com.softcare.raphnote.model.NoteViewModelFactory
 import kotlinx.coroutines.flow.collect
+import java.io.InputStream
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
@@ -48,6 +49,10 @@ import kotlin.math.sqrt
  * A simple [Fragment] subclass as the second destination in the navigation.
  */
 class NoteViewFragment : Fragment() , View.OnTouchListener {
+
+    private val mExecutor: Executor = Executors.newSingleThreadExecutor()
+
+
     private val viewModel: NoteViewModel by viewModels {
         NoteViewModelFactory((activity?.application as NoteApp).repository)
     }
@@ -65,67 +70,105 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentNoteViewBinding.inflate(inflater, container, false)
-       // binding.text.setText(arguments?.getString("text", "text"))
-      //  binding.time.setText(arguments?.getLong("time")?.let { Schema().getTime(it) })
+        // binding.text.setText(arguments?.getString("text", "text"))
+        //  binding.time.setText(arguments?.getLong("time")?.let { Schema().getTime(it) })
         //arguments?.getLong("time")?.let { time = it }
-       // arguments?.getLong("id")?.let { id = it }
-        binding.text.setOnTouchListener(this) 
-
+        // arguments?.getLong("id")?.let { id = it }
+        binding.text.setOnTouchListener(this)
 
         lifecycleScope.launchWhenStarted {
             viewModel.noteUiState.collect {
                 when (it) {
                     is NoteViewModel.NoteUiState.NoteOpened -> {
                         binding.text.text = it.note.text
-                        binding.time.text=Schema().getTime(it.note.time)
-                           time = it.note.time
-                          id = it.note.id
-                        Log.d(Schema().tag,"Note opened "+it.javaClass.simpleName)
+                        binding.time.text = Schema().getTime(it.note.time)
+                        time = it.note.time
+                        id = it.note.id
+                        Log.d(Schema().tag, "Note opened " + it.javaClass.simpleName)
 
                     }
                     is NoteViewModel.NoteUiState.FileOpened -> {
-                        binding.text.text=it.text
-                        Snackbar.make(binding.root, getString(R.string.opened), Snackbar.LENGTH_LONG).show()
-                        Log.d(Schema().tag,"File opened "+it.javaClass.simpleName)
+                        binding.text.text = it.text
+                        Snackbar.make(
+                            binding.root,
+                            getString(R.string.opened),
+                            Snackbar.LENGTH_LONG
+                        ).show()
+                        Log.d(Schema().tag, "File opened " + it.javaClass.simpleName)
 
                     }
 
                     is NoteViewModel.NoteUiState.Error -> {
                         Snackbar.make(binding.root, it.message, Snackbar.LENGTH_INDEFINITE).show()
                     }
-                  is  NoteViewModel.NoteUiState.Empty -> {}
-
-                  is  NoteViewModel.NoteUiState.Opening -> {
-                        Snackbar.make(binding.root, getString(R.string.opening), Snackbar.LENGTH_SHORT).show()
+                    is NoteViewModel.NoteUiState.Empty -> {
                     }
-                  is  NoteViewModel.NoteUiState.Deleting -> {
-                        Snackbar.make(binding.root, getString(R.string.deleting), Snackbar.LENGTH_INDEFINITE).show()
+
+                    is NoteViewModel.NoteUiState.Opening -> {
+                        Snackbar.make(
+                            binding.root,
+                            getString(R.string.opening),
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                    }
+                    is NoteViewModel.NoteUiState.Deleting -> {
+                        Snackbar.make(
+                            binding.root,
+                            getString(R.string.deleting),
+                            Snackbar.LENGTH_INDEFINITE
+                        ).show()
                     }
                     is NoteViewModel.NoteUiState.Exported -> {
-                        Snackbar.make(binding.root, getString(R.string.exported_to)+" "+it.path, Snackbar.LENGTH_LONG).show()
-                        Log.d(Schema().tag,"Note Exported "+it.javaClass.simpleName)
+                        Snackbar.make(
+                            binding.root,
+                            getString(R.string.exported_to) + " " + it.path,
+                            Snackbar.LENGTH_LONG
+                        ).show()
 
                     }
-                   is NoteViewModel.NoteUiState.Exporting -> {
-                        Snackbar.make(binding.root, getString(R.string.exporting), Snackbar.LENGTH_INDEFINITE).show()
+                    is NoteViewModel.NoteUiState.Exporting -> {
+                        Snackbar.make(
+                            binding.root,
+                            getString(R.string.exporting),
+                            Snackbar.LENGTH_INDEFINITE
+                        ).show()
                     }
-                  is  NoteViewModel.NoteUiState.NoteDeleted -> {
-                        Toast.makeText(context, getString(R.string.note_deleted), Toast.LENGTH_LONG).show()
-                      Log.d(Schema().tag,"Note deleted "+it.javaClass.simpleName)
-                      NavHostFragment.findNavController(this@NoteViewFragment).navigate(
-                          R.id.action_ListNotesTo_ViewNote    )
+                    is NoteViewModel.NoteUiState.NoteDeleted -> {
+                        Snackbar.make(
+                            binding.root,
+                            getString(R.string.note_deleted),
+                            Snackbar.LENGTH_LONG
+                        ).show()
+                        NavHostFragment.findNavController(this@NoteViewFragment).navigate(
+                            R.id.action_NoteViewToNoteList
+                        )
                     }
+                    is NoteViewModel.NoteUiState.FileOpenUpdate -> {
+                        binding.text.text = it.text
+                        Log.d(Schema().tag,  "   receive data "+it.text.length)
+                        Snackbar.make(
+                            binding.root, getString(R.string.open_taking_much_time),
+                            Snackbar.LENGTH_INDEFINITE
+                        )
+                            .setAction(getString(R.string.stop), { viewModel.stop = true }).show()
 
-                    else -> { Toast.makeText(context, "unknown action", Toast.LENGTH_LONG).show()
-                        Log.e(Schema().tag,"unknown action occured "+it.javaClass.simpleName)
+                    }
+                    is NoteViewModel.NoteUiState.Stop -> {
+                        binding.text.text = it.text
+                        Snackbar.make(
+                            binding.root,
+                            getString(R.string.succuceffully_cancelled),
+                            Snackbar.LENGTH_LONG
+                        ).show()
 
                     }
-                }  }   }
+                }
+            }
+        }
 
         return binding.root
 
     }
-
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -135,7 +178,8 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
 
             override fun searchText(query: String?) {
                 query?.let {
-                    searchInText(binding.text, it) }
+                    searchInText(binding.text, it)
+                }
             }
 
             override fun optionMenu(menuId: Int): Boolean {
@@ -154,7 +198,7 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
                     }
                     else -> return false
                 }
-                return  true
+                return true
             }
 
             override fun editNote() {
@@ -176,31 +220,36 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
 
 
     }
-    fun searchInText(textView: TextView, query: String)   {
 
-        textView.text = textView.text.toString()//refresh search
-        val tvt: String = textView.text.toString()
-        var ofs: Int = tvt.indexOf(query, 0)
-        val wordToSpan: Spannable = SpannableString(textView.text)
-        var ofe = ofs + query.length
-        while (ofs < tvt.length && ofs != -1 && ofe < tvt.length) {
+    fun searchInText(textView: TextView, query: String) {
+        mExecutor.execute( Runnable {
+            textView.text = textView.text.toString()//refresh search
+            val tvt: String = textView.text.toString().lowercase()
+            val q= query.lowercase()
+            var ofs: Int = tvt.indexOf(q, 0)
+            val wordToSpan: Spannable = SpannableString(textView.text)
+            var ofe = ofs + q.length
+        while (ofs < tvt.length && ofs != -1 && ofe <= tvt.length &&q.isNotEmpty()) {
             wordToSpan.setSpan(
                 BackgroundColorSpan(Color.GRAY), ofs, ofe,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
-            textView.setText(wordToSpan, TextView.BufferType.SPANNABLE)
-            ofs = tvt.indexOf(query, ofe)
-            ofe = ofs + query.length
-        }
+            Log.d(Schema().tag,  " loop on  $query ")
+            activity?.runOnUiThread(Runnable {  textView.setText(wordToSpan, TextView.BufferType.SPANNABLE)})
+
+            ofs = tvt.indexOf(q, ofe)
+            ofe = ofs + q.length
+        }})
     }
-  private  fun copyToClipboard(text: String) {
+
+    private fun copyToClipboard(text: String) {
         val clipboard = context?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("", text)
         clipboard.setPrimaryClip(clip)
-        Snackbar.make(binding.root, getString(R.string.copied), Snackbar.LENGTH_LONG).show()
+        Snackbar.make(binding.root, getString(R.string.text_copied), Snackbar.LENGTH_LONG).show()
     }
 
-  private  fun deleteNote() {
+    private fun deleteNote() {
         context?.let {
             val title = getString(R.string.delete)
             val message = getString(R.string.delete_note_msg)
@@ -212,30 +261,33 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
             ad.setMessage(message)
             ad.setPositiveButton(
                 button1String,
-                { dialog, arg1 -> deleting()  })
+                { dialog, arg1 -> deleting() })
             ad.setNegativeButton(
                 button2String,
                 { dialog, arg1 -> })
             ad.show()
         }
     }
-/*
+
+    /*
     private fun delete(){
             CoroutineScope(Dispatchers.IO).launch {
                 (activity?.application as NoteApp).repository.deleteNote(Note(id, time, ""))
 
         }    }
     */
-    private  fun deleting(){
-    if(id!=0L)
-    viewModel.deleteNote(id) else{
-        Snackbar.make(binding.root, getString(R.string.note_not_exist), Snackbar.LENGTH_LONG).show()
+    private fun deleting() {
+        if (id != 0L)
+            viewModel.deleteNote(id) else {
+            Snackbar.make(binding.root, getString(R.string.note_not_exist), Snackbar.LENGTH_LONG)
+                .show()
 
+        }
     }
-    }
-    fun shareText(text:String){
+
+    fun shareText(text: String) {
         //https://play.google.com/store/apps/details?id=com.softcare.raphnote
-        val contentUri= Uri.parse("android.resource://com.softcare.raphnote/drawable/image_name")
+        //  val contentUri= Uri.parse("android.resource://com.softcare.raphnote/drawable/image_name")
         val sendIntent: Intent = Intent().apply {
             action = Intent.ACTION_SEND
             type = "text/*"
@@ -244,63 +296,40 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
             putExtra(Intent.EXTRA_TITLE, "Send to")
             // (Optional) Here we're passing a content URI to an image to be displayed
             //data = contentUri
-           // flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            // flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
         }
         val shareIntent = Intent.createChooser(sendIntent, "Share with")
         startActivity(shareIntent)
     }
 
-    private fun exportToFile(){
-     val permissions= arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        context?.let { if(hasPermissions(it, permissions = permissions) ){
+    private fun exportToFile() {
+        val permissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        context?.let {
+            if (hasPermissions(it, permissions = permissions)) {
 
-            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-               addCategory(Intent.CATEGORY_OPENABLE)
-                type = "text/*"
-                putExtra(Intent.EXTRA_TITLE, getString(R.string.default_save_name))
+                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = "text/*"
+                    putExtra(Intent.EXTRA_TITLE, getString(R.string.default_save_name))
 
-                // Optionally, specify a URI for the directory that should be opened in
-                // the system file picker before your app creates the document.
-                // putExtra(DocumentsContract.EXTRA_INITIAL_URI, null)
-            }
-            resultLauncher.launch(intent)
-        }else{
-            Snackbar.make(binding.root,"Please accept storage access permission to proceed", Snackbar.LENGTH_LONG).show()
-            activity?.let { it1 -> ActivityCompat.requestPermissions(it1, permissions, 1) };
+                    // Optionally, specify a URI for the directory that should be opened in
+                    // the system file picker before your app creates the document.
+                    // putExtra(DocumentsContract.EXTRA_INITIAL_URI, null)
+                }
+                resultLauncher.launch(intent)
+            } else {
+                Snackbar.make(
+                    binding.root,
+                    "Please accept storage access permission to proceed",
+                    Snackbar.LENGTH_LONG
+                ).show()
+                activity?.let { it1 -> ActivityCompat.requestPermissions(it1, permissions, 1) }
 
-        }
-        }
-    }
-
-    val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            // There are no request codes
-            val data: Intent? = result.data
-            if(data!=null)
-                data.data?.also {
-                    // open file intent
-                    context?.contentResolver?.openOutputStream(it)?.let { it1 ->
-                        viewModel.exportText(  it1,binding.text.text.toString() )
-                    }
-                    }
-            else context?.let {
-                Snackbar.make(binding.root,
-                    it.getString(R.string.error_occurred), Snackbar.LENGTH_LONG).show()
             }
         }
     }
 
-
-    fun openFile() {
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "text/*"
-        }
-
-        openFileLauncher.launch(intent)
-    }
-
-    val openFileLauncher =
+    val resultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 // There are no request codes
@@ -308,10 +337,41 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
                 if (data != null)
                     data.data?.also {
                         // open file intent
-                        context?.contentResolver?.openInputStream(it)?.let { it1 ->
-                            viewModel.openFile(
-                                it1
-                            )
+                        context?.contentResolver?.openOutputStream(it)?.let { it1 ->
+                            viewModel.exportText(it1, binding.text.text.toString())
+                        }
+                    }
+                else context?.let {
+                    Snackbar.make(
+                        binding.root,
+                        it.getString(R.string.error_occurred), Snackbar.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+
+
+    fun openFile() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "*/*"
+        }
+        openFileLauncher.launch(intent)
+    }
+
+    private val openFileLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                // There are no request codes
+                val data: Intent? = result.data
+                if (data != null)
+                    data.data?.also {
+                        // open file intent
+                        it.run {
+                            context?.contentResolver?.openInputStream(it)?.let { it1 ->
+                                viewModel.openFile(it1, mExecutor)
+                            }
+
                         }
 
                     }
@@ -329,31 +389,33 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
         startNote()
     }
 
-private  fun  startNote(){
-    id = arguments?.getLong("id", 0L)!!
-    if(id==0L) {
-        val  isFile=arguments?.getBoolean("openFile")
-        if(isFile == true){
-           arguments?.putBoolean("openFile",false)
-            try {
-              openFile()
-            }catch (e: Exception){
-                context?.let {
-                    Snackbar.make(binding.root,
-                        it.getString(R.string.error_occurred)+" "+e.localizedMessage, Snackbar.LENGTH_LONG).show()
+    private fun startNote() {
+        id = arguments?.getLong("id", 0L)!!
+        if (id == 0L) {
+            val isFile = arguments?.getBoolean("openFile")
+            if (isFile == true) {
+                arguments?.putBoolean("openFile", false)
+                try {
+                    openFile()
+                } catch (e: Exception) {
+                    context?.let {
+                        Snackbar.make(
+                            binding.root,
+                            it.getString(R.string.error_occurred) + " " + e.localizedMessage,
+                            Snackbar.LENGTH_LONG
+                        ).show()
+                    }
+                }
+
+            } else {
+                val sendText = arguments?.getString("text")
+                if (sendText != null && sendText.isNotEmpty() && sendText.isNullOrBlank()) {
+                    binding.text.text = sendText
+                    arguments?.getLong("time")?.let { time = it }
                 }
             }
-
-        } else {
-            val sendText=   arguments?.getString("text")
-            if(sendText!=null&&sendText.isNotEmpty()&&sendText.isNullOrBlank()) {
-                binding.text.text = sendText
-                arguments?.getLong("time")?.let { time = it }
-            }
-        }
-    }  else viewModel.openNote(id)
-}
-
+        } else viewModel.openNote(id)
+    }
 
 
     override fun onDestroyView() {
@@ -409,17 +471,19 @@ private  fun  startNote(){
     //
 
 
-   fun  hasPermissions(context:Context, permissions:Array<String> ) :Boolean{
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-            && context != null && permissions != null) {
+    fun hasPermissions(context: Context, permissions: Array<String>): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+            && context != null && permissions != null
+        ) {
             for (permission in permissions) {
                 if (ActivityCompat.checkSelfPermission(context, permission) !=
-                    PackageManager.PERMISSION_GRANTED) {
-                    return false;
+                    PackageManager.PERMISSION_GRANTED
+                ) {
+                    return false
                 }
             }
         }
-        return true;
+        return true
     }
 
     fun setTitlebols(fullText: String, searchText: String?): Spanned? {
@@ -459,4 +523,6 @@ private  fun  startNote(){
         }
         return span
     }
+
+
 }

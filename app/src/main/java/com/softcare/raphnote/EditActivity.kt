@@ -1,5 +1,4 @@
 package com.softcare.raphnote
-
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -96,6 +95,7 @@ open class EditActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onBackPressed() {
         if(exit)super.onBackPressed()
+        else exitNote()
     }
     private fun exitNote() {
             val title = getString(R.string.exit_editing)

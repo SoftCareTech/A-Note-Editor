@@ -20,7 +20,8 @@ class Repos(private val noteDao: NoteDao) {
     @WorkerThread
     suspend fun getNoteById(id: Long):  Note = noteDao.getNoteById(id)
     @WorkerThread
-    suspend fun getAllNotesASC(orderColumn: String):  List<Note> = noteDao.getAllNotesASC(orderColumn)
+    suspend fun getAllNotesASC(orderColumn: String):  List<Note> =
+        noteDao.getAllNotesASC(orderColumn)
 
     @WorkerThread
     suspend fun getAllNotesDESC(orderColumn: String):  List<Note> =

@@ -13,12 +13,16 @@ import androidx.lifecycle.viewModelScope
 import com.softcare.raphnote.db.Repos
 import com.softcare.raphnote.db.NoteDao
 import com.softcare.raphnote.db.Schema
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.io.*
 import java.net.URI
+import java.nio.charset.Charset
+import java.util.concurrent.Executor
 
 class NoteViewModel(private val resp: Repos) : ViewModel() {
     private val _noteUiState = MutableStateFlow<NoteUiState>(NoteUiState.Empty)
@@ -31,6 +35,7 @@ class NoteViewModel(private val resp: Repos) : ViewModel() {
         _noteUiState.value = NoteUiState.NoteOpened(resp.getNoteById(id))
     }
 
+  var stop=false
     fun openFile(path: String) = viewModelScope.launch {
         _noteUiState.value =  NoteUiState.Opening
         val file = File(path)
@@ -50,22 +55,74 @@ class NoteViewModel(private val resp: Repos) : ViewModel() {
         }
 
     }
-    fun openFile(   inputStream: InputStream) = viewModelScope.launch {
 
+
+
+    fun openFile(inputStream: InputStream, mExecutor: Executor) {
+        mExecutor.execute( Runnable {
+            stop=false
+            if(inputStream!=null){
+                var s= System.currentTimeMillis()
+                val st= System.currentTimeMillis()
+                try {
+                    var text = StringBuilder()
+                    //val br =inputStream.bufferedReader()
+
+                    _noteUiState.value = NoteViewModel.NoteUiState.Opening
+                    var cn = inputStream.read()
+
+                    while (cn != -1&&!stop) {
+                        val c= Char(cn)
+                        text.append(Char(cn))
+                        cn = inputStream.read()
+                      ///  Log.d(Schema().tag,  " long on int $cn  charater $c   time spent"+(   System.currentTimeMillis()-st))
+                        if(System.currentTimeMillis()-s>10000) {  // updating at 10 seconds
+                            s=System.currentTimeMillis()
+                            _noteUiState.value = NoteViewModel.NoteUiState.FileOpenUpdate(text.toString())
+                            Log.d(Schema().tag,  " send date "+text.length)
+                        }
+                    }
+                    inputStream.close()
+                    if(stop) {
+                        _noteUiState.value = NoteViewModel.NoteUiState.Stop(text.toString())
+
+                    }else
+                        _noteUiState.value = NoteViewModel.NoteUiState.FileOpened(text.toString())
+                } catch (e: Exception) {
+                    _noteUiState.value = NoteViewModel.NoteUiState.Error(e.localizedMessage)
+                    e.printStackTrace()
+                }
+            }
+
+        });
+
+
+    }
+    fun openFile(   inputStream: InputStream)  = CoroutineScope(Dispatchers.IO).launch {
+        stop=false
         if(inputStream!=null){
+            var s= System.currentTimeMillis()
             try {
                 var text = StringBuilder()
                 val br =inputStream.bufferedReader()
-                var line: String?
-                line = br.readLine()
-                while (line != null) {
-                    Log.d(Schema().tag, line)
-                    text.append(line)
-                    text.append("\n")
-                    line = br.readLine()
 
+                _noteUiState.value = NoteUiState.Opening
+                var line = br.read()
+
+                while (line != -1&&!stop) {
+                    text.append(Char(line))
+                    line = br.read()
+                    if(System.currentTimeMillis()-s>500) {
+                        s=System.currentTimeMillis()
+                        _noteUiState.value = NoteUiState.FileOpenUpdate(text.toString())
+                        Log.d(Schema().tag,  " send date "+text.length)
+                    }
                 }
                 inputStream.close()
+                if(stop) {
+                    _noteUiState.value = NoteUiState.Stop(text.toString())
+
+                }else
                 _noteUiState.value = NoteUiState.FileOpened(text.toString())
             } catch (e: Exception) {
                 _noteUiState.value = NoteUiState.Error(e.localizedMessage)
@@ -87,19 +144,6 @@ class NoteViewModel(private val resp: Repos) : ViewModel() {
 
     }
 
-    fun exportToFile(uri: Uri, text: String) = viewModelScope.launch {
-        try {
-            _noteUiState.value = NoteUiState.Exporting
-            val file = File(uri.path)
-            file.createNewFile()
-            file.writeText(text, Charsets.UTF_32)
-            _noteUiState.value = NoteUiState.Exported(file.absolutePath)
-        } catch (e: Exception) {
-            _noteUiState.value = NoteUiState.Error(e.localizedMessage)
-        }
-
-
-    }
     fun exportText(out: OutputStream, text: String) = viewModelScope.launch {
 
             _noteUiState.value = NoteUiState.Exporting
@@ -126,6 +170,8 @@ class NoteViewModel(private val resp: Repos) : ViewModel() {
         data class NoteOpened(var note: Note) : NoteUiState()
         object Opening : NoteUiState()
         data class FileOpened(val text: String) : NoteUiState()
+        data class FileOpenUpdate(val text: String) : NoteUiState()
+        data class Stop(val text: String) : NoteUiState()
         data class Error(val message: String) : NoteUiState()
         object Deleting : NoteUiState()
         object NoteDeleted : NoteUiState()

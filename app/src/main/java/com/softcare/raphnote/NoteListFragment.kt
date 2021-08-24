@@ -89,15 +89,13 @@ class NoteListFragment : Fragment() {
         }
 
 
-        viewModel.getNoteList(false, Schema.Note.ID)
+       viewModel.getNoteList(false, Schema.Note.ID)
         return binding.root
 
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-       // help()
         (activity as MainActivity?)!!.changeMenu(changeObserver = object : ChangeObserver {
             override fun searchNotes(ascending: Boolean, orderColumn: String, query: String?) {
                 if (query != null) {
