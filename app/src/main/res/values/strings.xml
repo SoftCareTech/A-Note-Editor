@@ -17,10 +17,10 @@
     <string name="error_occurred">Error occurred</string>
     <string name="share_text">Share text</string>
     <string name="action_share_app">Share App</string>
-    <string name="delete_note_msg">Delete current note? You won\'t be able to recover it</string>
+    <string name="delete_note_msg">Delete current note?\nYou won\'t be able to recover it</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
-    <string name="exit_edit_msg">You are leaving edit mode. Will like to save changes</string>
+    <string name="exit_edit_msg">You are leaving editing mode.\nWill like to save changes</string>
     <string name="exit_editing">"Exit editing "</string>
     <string name="saved">Saved</string>
     <string name="saving">Saving</string>
@@ -37,31 +37,40 @@
     <string name="create_note">Create note</string>
     <string name="edit_note">Edit note</string>
     <string name="large_text">
-Note edit app simple and secured for keeping text notes. It have the capability of exporting your text to file to view on computer.
-Apart provide a good interface for typing it also gives you ability open files that it file type is not specified as text file to see it raw content.
-The app is aim at speed for manipulating simple note.
+Note edit app simple and secured for keeping text notes. It have the capability of exporting your text to file to be view on computer. Not leaving out ability to share with other Apps like  message, WhatApp, and Facebook e.t.c. Apart provide a good interface for typing, it also gives you ability open any file as text file to see it raw content as text. Creating notes can be from web directly by selecting what need and sharing it with the App(A Note Editor).
+The app is aim at speed for manipulating simple notes.
 How to use the app
-The app have four main views
+The app have following interface
+
+Start (Lock  app if enable)
 Notes lists (initial view)
-View/preview  note0
-Create/edit note
+Reading mode
+Editing mode
 Settings
+App Guide
 
 Now open the app
-
+Start (Lock  app if enable)
+    This will require you to authenticate using your finger print pin or password word( Note: This interface is secured and we did not access to your password, pin, finger print or others we only receive  basic action in our code such as succeed or failed)
+        Always enable security to prevent unwanted user accessing your  phone.
 Functions available Note list view
        Press on add button to create new note(bottom center).
-       Press on a note to view/edit (take you to view/preview where you can edit by pressing the edit icon)
+       Press on a note to read note (in reading mode you can edit by pressing the edit icon{pen})
        Press search icon(top right second icon) then type to search for notes(use to find note when notes list is much.
-       Press options menu icon(top right first icon) then press settings(moving to settings view)
+       Press options menu icon(top right first icon) to see the following options:
+        Share App, ---> Share the app link with family and friends
+        Open File, ---> Open any file as text file
+        App Guid,  ---> See basic usage scenario
+        Help,      --->  Open for more help
+        Settings   --->  Change sorting, ordering and security preferences of the app
 
-Functions available Note create/edit
-       press the check to preview
-       press back arrow to end edit
+Functions available Note Editing mode
+       press the check to save note and read without keyboard(that is to reading mode)
+       press back arrow to end editing mode( prompt will be ask if you want to save changes)
 
-Functions available in preview/view note.
-       press edit ico in preview to edit note(bottom center)
-       Press search icon(top right second icon) then type to search for a word or sentence occurrence in the note.
+Functions available in  note Reading mode
+       press edit icon to edit note(bottom center)
+       Press search icon(top right second icon) then type a word or sentence  to search for it occurrence in the note.
        Press options menu icon(top right first icon) then press:
               Export (to save note as text file)
               copy all (to copy note to clipboard so as to past it some where)
@@ -72,6 +81,10 @@ Functions available in Settings
        select note list ordering (Order by: Ascending or Descending)
        select note list sorting(Sort by date created or modified)
        select security check/time(Require system password after 1 minute, 2 minute, 3 minute, 5 minutes or none)
+
+
+Functions available App Guide
+       App Guide will show once but can by reopen to show the basic function available
 
 
 </string>
@@ -88,5 +101,28 @@ Functions available in Settings
     <string name="app_guide">App Guide</string>
     <string name="open_taking_much_time">open file taking much tim</string>
     <string name="stop">Stop</string>
-    <string name="succuceffully_cancelled">Succefully cancelled</string>
+    <string name="successfully_cancelled">Successfully cancelled</string>
+    <string name="size_read">Size read</string>
+    <string name="file_too_large">File too large</string>
+    <string name="reading_mode">Reading mode</string>
+    <string name="slide_1_title">Welcome</string>
+    <string name="slide_1_msg">You can always come to this guide by selecting App Guide in options menu of Note List.</string>
+    <string name="slide_2_title">Notes List (main view)</string>
+    <string name="slide_2_msg">Click on plus sign  to add note. Click on a note to  read. Click on search ico to search for not that contain the type word. Click on three vertical dot(Options menu) for more options</string>
+    <string name="slide_02_title">Note List  … Options Menu</string>
+    <string name="slide_02_msg"> Click on: Share ico(or Share App) to share this app link to share the others, Open File to open a file as text file in reading mode. App Guide to this guide, Help for online documentation, Settings( for security, sorting and ordering)</string>
+    <string name="slide_3_title">Reading mode</string>
+    <string name="slide_3_msg">Click on pen sign  to edit note. Search  ico  to search for a word in the note. Click on three vertical dot(Options menu) for more options</string>
+    <string name="slide_03_title">Reading Mode  … Options Menu</string>
+    <string name="slide_03_msg">"Export  to file(to save note as text file), copy all (to copy note to clipboard so as to past it some where), share ( to share text with people using apps(like Message app, WhatApp app, Facebook, Email,e.t.c), and delete(to completely remove the note)"</string>
+    <string name="slide_4_title">Editing mode</string>
+    <string name="slide_4_msg">Click on top right check  icon to save and exit editing mode. Click on a on top left icon to stop editing(you will ask if you want to save changes).</string>
+   <string name="slide_6_title">Security Setting</string>
+    <string name="slide_6_msg">Select settings in note list options menu. Enable security by selecting the enable security(never to others). This will ask for finger print authentication, pin or pattern on start of the App. </string>
+    <string name="slide_7_title">Create note from other apps</string>
+    <string name="slide_7_msg">Highlight text in chrome or any other app then click share in the app. List of app will be prompt to you. Select \'A Note Editor\' then it will take you to editing mode select check to save and continue with your action the other app. Or back if you intended to cancel the operation.</string>
+    <string name="slide_8_title">… Let get started</string>
+    <string name="slide_8_msg">\"You can always reach us at raphaelraymondproduct@gmail.com.\nDon\'t forget to send us feedback at the email.</string>
+    <string name="open_notes">Open Notes</string>
+    <string name="no_security_msg">The phone have no security</string>
 </resources>

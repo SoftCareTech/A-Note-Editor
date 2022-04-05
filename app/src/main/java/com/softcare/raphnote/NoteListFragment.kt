@@ -1,33 +1,25 @@
 package com.softcare.raphnote
 
-import android.app.Activity
 import android.content.Intent
-import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
-import android.provider.SyncStateContract.Columns.DATA
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
-import com.softcare.business.model.NoteAdapter
+import com.softcare.raphnote.model.NoteAdapter
 import com.softcare.raphnote.databinding.FragmentNoteListBinding
 import com.softcare.raphnote.db.NoteApp
-import com.softcare.raphnote.db.Schema
 import com.softcare.raphnote.model.ChangeObserver
 import com.softcare.raphnote.model.ClickObserver
 import com.softcare.raphnote.model.NoteListModel
 import com.softcare.raphnote.model.NoteListModelFactory
 import kotlinx.coroutines.flow.collect
-import java.io.File
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -38,6 +30,16 @@ class NoteListFragment : Fragment() {
             (activity?.application as NoteApp).repository
         )
     }
+
+    private val  orderAscending:Boolean
+        get(){
+            return  (activity as MainActivity?)!!.orderAscending
+        }
+    private val columnId:Boolean
+        get(){
+            return return  (activity as MainActivity?)!!.columnId
+        }
+
 
     private var _binding: FragmentNoteListBinding? = null
 
@@ -55,7 +57,7 @@ class NoteListFragment : Fragment() {
             context, object : ClickObserver {
                 override fun click(id: Long) {
                     val bundle = Bundle();
-                    bundle.putLong("id", id);
+                    bundle.putLong("id", id)
                     findNavController(this@NoteListFragment).navigate(
                         R.id.action_ListNotesTo_ViewNote,
                         bundle
@@ -64,9 +66,9 @@ class NoteListFragment : Fragment() {
                 }
 
                 override fun click(id: Long, time: Long, text: String) {
-                    val bundle = Bundle();
-                    bundle.putLong("id", id);
-                    bundle.putLong("time", time);
+                    val bundle = Bundle()
+                    bundle.putLong("id", id)
+                    bundle.putLong("time", time)
                     bundle.putString("text", text);
                     findNavController(this@NoteListFragment).navigate(
                         R.id.action_ListNotesTo_ViewNote,
@@ -77,7 +79,7 @@ class NoteListFragment : Fragment() {
         )
 
         binding.noteList.adapter = adapter
-        binding.noteList.setLayoutManager(LinearLayoutManager(context));
+        binding.noteList.setLayoutManager(LinearLayoutManager(context))
 
         // binding.root.setOnLongClickListener(View.OnLongClickListener
         lifecycleScope.launchWhenStarted {
@@ -89,7 +91,7 @@ class NoteListFragment : Fragment() {
         }
 
 
-       viewModel.getNoteList(false, Schema.Note.ID)
+
         return binding.root
 
     }
@@ -97,18 +99,14 @@ class NoteListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         (activity as MainActivity?)!!.changeMenu(changeObserver = object : ChangeObserver {
-            override fun searchNotes(ascending: Boolean, orderColumn: String, query: String?) {
+            override fun searchNotes(query: String?) {
                 if (query != null) {
-                    viewModel.searchNotes(ascending, orderColumn, query)
+                    viewModel.searchNotes(orderAscending, columnId, query)
                 } else
-                    viewModel.getNoteList(ascending, orderColumn)
+                    viewModel.getNotes(orderAscending, columnId)
             }
-
-            override fun getNoteList(ascending: Boolean, orderColumn: String) {
-                viewModel.getNoteList(ascending, orderColumn)
-            }
-
             override fun searchText(query: String?) {
+
             }
 
             override fun optionMenu(menuId: Int): Boolean {
@@ -126,7 +124,8 @@ class NoteListFragment : Fragment() {
                             bundle  )
                     }
                     R.id.action_share_app -> shareApp()
-                    R.id.action_help -> help()
+                    R.id.action_app_guide -> appGuide()
+                    R.id.action_more -> more()
                     else -> return false
                 }
                 return true
@@ -162,9 +161,7 @@ class NoteListFragment : Fragment() {
 
     }
 
-    fun help() {
-        this.context?.startActivity(Intent(Intent(context, AppGuide::class.java)));
-        if (true) return
+    fun more(){
         val url = "https://raph-ray.blogspot.com/2021/08/a-note-editor.html"
         try {
             this.context?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)));
@@ -183,5 +180,11 @@ class NoteListFragment : Fragment() {
         _binding = null
     }
 
-
+    override fun onResume() {
+        super.onResume()
+        viewModel.getNotes(ascending = orderAscending, orderById = columnId)
+    }
+private  fun  appGuide() {
+    this.context?.startActivity(Intent(Intent(context, AppGuide::class.java)))
+}
 }

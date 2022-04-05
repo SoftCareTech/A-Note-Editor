@@ -4,24 +4,39 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingStart="@dimen/fab_margin"
+    android:paddingEnd="@dimen/fab_margin"
     tools:context=".NoteViewFragment">
+
+    <TextView
+        android:id="@+id/id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/time"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="2012/09/22" />
 
     <TextView
         android:id="@+id/time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/id"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="2012/09/22" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:paddingStart="@dimen/fab_margin"
-        android:paddingEnd="@dimen/fab_margin"
-        android:paddingBottom="100dp"
+        android:layout_height="match_parent"
         android:clipToPadding="false"
+        android:paddingTop="@dimen/fab_margin"
+        android:paddingBottom="100dp"
         android:saveEnabled="true"
         android:scrollbarStyle="outsideOverlay"
         android:scrollbars="vertical"
@@ -30,22 +45,22 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/time"  >
+        app:layout_constraintTop_toBottomOf="@+id/time">
 
         <TextView
             android:id="@+id/text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:autoLink="all"
+            android:hapticFeedbackEnabled="true"
             android:linksClickable="true"
             android:overScrollMode="always"
-            android:saveEnabled="true"
-            android:hapticFeedbackEnabled="true"
 
+            android:saveEnabled="true"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textIsSelectable="true"
             android:textSize="16sp"
             android:typeface="normal"
-            android:autoLink="all"
             tools:text="@string/large_text" />
     </androidx.core.widget.NestedScrollView>
 

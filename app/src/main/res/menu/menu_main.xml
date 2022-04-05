@@ -21,14 +21,20 @@
         android:orderInCategory="100"
         android:title="@string/action_open_file"
         app:showAsAction="never" />
+
     <item
-        android:id="@+id/action_help"
+        android:id="@+id/action_app_guide"
         android:orderInCategory="100"
-        android:title="@string/action_help"
+        android:title="@string/app_guide"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_more"
+        android:orderInCategory="100"
+        android:title="@string/action_help"
         app:showAsAction="never" />
 </menu>

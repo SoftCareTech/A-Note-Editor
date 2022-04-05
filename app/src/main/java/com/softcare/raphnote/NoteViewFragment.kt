@@ -10,10 +10,8 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.text.Html
 import android.text.Spannable
 import android.text.SpannableString
-import android.text.Spanned
 import android.text.style.BackgroundColorSpan
 import android.util.Log
 import android.view.LayoutInflater
@@ -35,10 +33,10 @@ import com.softcare.raphnote.db.Schema
 import com.softcare.raphnote.model.ChangeObserver
 import com.softcare.raphnote.model.NoteViewModel
 import com.softcare.raphnote.model.NoteViewModelFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
-import java.io.InputStream
-import java.util.concurrent.Executor
-import java.util.concurrent.Executors
+import kotlinx.coroutines.launch
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
@@ -49,8 +47,6 @@ import kotlin.math.sqrt
  * A simple [Fragment] subclass as the second destination in the navigation.
  */
 class NoteViewFragment : Fragment() , View.OnTouchListener {
-
-    private val mExecutor: Executor = Executors.newSingleThreadExecutor()
 
 
     private val viewModel: NoteViewModel by viewModels {
@@ -82,13 +78,14 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
                     is NoteViewModel.NoteUiState.NoteOpened -> {
                         binding.text.text = it.note.text
                         binding.time.text = Schema().getTime(it.note.time)
+                        binding.id.text = Schema().getTime(it.note.id)
                         time = it.note.time
                         id = it.note.id
                         Log.d(Schema().tag, "Note opened " + it.javaClass.simpleName)
 
                     }
                     is NoteViewModel.NoteUiState.FileOpened -> {
-                        binding.text.text = it.text
+                        binding.text.append(it.text)
                         Snackbar.make(
                             binding.root,
                             getString(R.string.opened),
@@ -144,7 +141,7 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
                         )
                     }
                     is NoteViewModel.NoteUiState.FileOpenUpdate -> {
-                        binding.text.text = it.text
+                        binding.text.append(it.text)
                         Log.d(Schema().tag,  "   receive data "+it.text.length)
                         Snackbar.make(
                             binding.root, getString(R.string.open_taking_much_time),
@@ -153,11 +150,18 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
                             .setAction(getString(R.string.stop), { viewModel.stop = true }).show()
 
                     }
+                    is NoteViewModel.NoteUiState.FileTooLarge -> {
+                        Snackbar.make(
+                            binding.root, getString(R.string.file_too_large),
+                            Snackbar.LENGTH_LONG
+                        ).show()
+
+                    }
                     is NoteViewModel.NoteUiState.Stop -> {
-                        binding.text.text = it.text
+                        binding.text.append(it.text)
                         Snackbar.make(
                             binding.root,
-                            getString(R.string.succuceffully_cancelled),
+                            getString(R.string.successfully_cancelled)+ getString(R.string.size_read)+" "+ binding.text.length(),
                             Snackbar.LENGTH_LONG
                         ).show()
 
@@ -210,36 +214,39 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
             }
 
 
-            override fun searchNotes(ascending: Boolean, orderColumn: String, query: String?) {
+            override fun searchNotes(query: String?) {
             }
 
-            override fun getNoteList(ascending: Boolean, orderColumn: String) {
-            }
+
 
         }, isList = false)
 
 
     }
 
-    fun searchInText(textView: TextView, query: String) {
-        mExecutor.execute( Runnable {
-            textView.text = textView.text.toString()//refresh search
+  private  fun searchInText(textView: TextView, query: String)  = CoroutineScope(Dispatchers.IO).launch {
             val tvt: String = textView.text.toString().lowercase()
-            val q= query.lowercase()
+            val query2= query.lowercase().trim().
+                  replace("?","")
+                .replace(".","")
+
+            val span: Spannable = SpannableString(textView.text.toString())
+            for(q in query2.split(" ")){
+                if(q.isEmpty()) continue
             var ofs: Int = tvt.indexOf(q, 0)
-            val wordToSpan: Spannable = SpannableString(textView.text)
             var ofe = ofs + q.length
         while (ofs < tvt.length && ofs != -1 && ofe <= tvt.length &&q.isNotEmpty()) {
-            wordToSpan.setSpan(
-                BackgroundColorSpan(Color.GRAY), ofs, ofe,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            Log.d(Schema().tag,  " loop on  $q ")
+            span.setSpan(BackgroundColorSpan(Color.GRAY), ofs, ofe,  Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
-            Log.d(Schema().tag,  " loop on  $query ")
-            activity?.runOnUiThread(Runnable {  textView.setText(wordToSpan, TextView.BufferType.SPANNABLE)})
+            Log.d(Schema().tag,  " loop on  $q ")
+            activity?.runOnUiThread(Runnable {  textView.setText(span, TextView.BufferType.SPANNABLE)})
 
             ofs = tvt.indexOf(q, ofe)
             ofe = ofs + q.length
-        }})
+        } }
+
+
     }
 
     private fun copyToClipboard(text: String) {
@@ -369,7 +376,7 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
                         // open file intent
                         it.run {
                             context?.contentResolver?.openInputStream(it)?.let { it1 ->
-                                viewModel.openFile(it1, mExecutor)
+                                viewModel.openFile(it1)
                             }
 
                         }
@@ -485,44 +492,5 @@ class NoteViewFragment : Fragment() , View.OnTouchListener {
         }
         return true
     }
-
-    fun setTitlebols(fullText: String, searchText: String?): Spanned? {
-        var fullText = fullText
-        var searchText = searchText
-        var span: Spanned?
-        searchText = searchText!!.replace("'", "")
-        searchText = searchText.replace("?", "")
-        val words = searchText.split(" ")
-
-        // highlight search text
-        if (null != searchText && searchText.isNotEmpty()) {
-            try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    for (wr in words) {
-                        fullText = fullText.replace(
-                            "(?i)($wr)",
-                            "<span><b><strong><font>$1</font></strong></b></span>"
-                        )
-                    }
-                    span = Html.fromHtml(fullText, Html.FROM_HTML_MODE_LEGACY)
-                    //                    , TextView.BufferType.SPANNABLE
-                } else {
-                    for (wr in words) {
-                        fullText = fullText.replace(
-                            "(?i)($wr)",
-                            "<b><big>$1</font></big></b>"
-                        )
-                    }
-                    span = Html.fromHtml(fullText)
-                }
-            } catch (e: Exception) {
-                span = Html.fromHtml(fullText)
-            }
-        } else {
-            span = Html.fromHtml(fullText)
-        }
-        return span
-    }
-
 
 }

@@ -7,7 +7,7 @@
     </string-array>
     <string-array name="sort_values"><!--schema bind values -->
         <item>id</item>
-        <item>last_edited</item>
+        <item>time</item>
     </string-array>
 
 

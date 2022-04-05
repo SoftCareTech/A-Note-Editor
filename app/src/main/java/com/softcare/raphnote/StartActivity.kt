@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.provider.Settings.ACTION_BIOMETRIC_ENROLL
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -46,6 +47,7 @@ class StartActivity : AppCompatActivity() {
                 override fun onAuthenticationFailed() {
                     super.onAuthenticationFailed()
                 }
+
             })
 
         promptInfo =
@@ -65,6 +67,10 @@ class StartActivity : AppCompatActivity() {
             "RaphNote",
             MODE_PRIVATE
         )
+        if(s.getBoolean("first",true)){
+            startActivity(Intent(applicationContext, AppGuide::class.java))
+            finish()
+        }
        if( s.getInt("lockAfter",0)!=3) {
            when (BiometricManager.from(this).canAuthenticate(allowedAuthenticators)) {
                BiometricManager.BIOMETRIC_SUCCESS -> biometricPrompt.authenticate(promptInfo)
@@ -126,7 +132,7 @@ private  fun  disableLock(){
         val enrollIntent =
             Intent(ACTION_BIOMETRIC_ENROLL).apply {
                 putExtra( Settings.EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED,
-                    BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL
+                    BIOMETRIC_STRONG or DEVICE_CREDENTIAL
                 )
             }
             var resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -149,5 +155,19 @@ private  fun  disableLock(){
         }
 
     }
+  fun open(v: View){
+    when (BiometricManager.from(this).canAuthenticate(allowedAuthenticators)) {
+        BiometricManager.BIOMETRIC_SUCCESS -> biometricPrompt.authenticate(promptInfo)
+        BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> notEnrol()
+        else -> {
+            disableLock()
+            Toast.makeText(
+                applicationContext,
+                getString(R.string.no_security_msg),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+}
 
 }

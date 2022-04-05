@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.collect
 
 open class EditActivity : AppCompatActivity(), View.OnClickListener {
     var id = 0L
+    var text=""
     private val viewModel: NoteEditModel by viewModels {
         NoteEditModelFactory((application as NoteApp).repository)
     }
@@ -54,6 +55,7 @@ open class EditActivity : AppCompatActivity(), View.OnClickListener {
 
                     }
                     is NoteEditModel.NoteUiState.NoteOpened-> {
+                        text=it.note.text
                         binding.textEdit.setText(it.note.text)
                     }
                     is NoteEditModel.NoteUiState.FileOpened-> {
@@ -98,6 +100,10 @@ open class EditActivity : AppCompatActivity(), View.OnClickListener {
         else exitNote()
     }
     private fun exitNote() {
+        if(binding.textEdit.toString().equals(text)) {
+            exit()
+            return
+        }
             val title = getString(R.string.exit_editing)
             val message = getString(R.string.exit_edit_msg)
         val button1String = getString(R.string.yes)
@@ -110,7 +116,7 @@ open class EditActivity : AppCompatActivity(), View.OnClickListener {
                 { dialog, arg1 -> save() })
             ad.setNegativeButton(
                 button2String
-            ) { dialog, arg1 ->  exit() }
+            ) { _, arg1 ->  exit() }
         ad.show()
 
     }

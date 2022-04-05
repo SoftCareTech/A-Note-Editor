@@ -8,7 +8,8 @@
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="140dp"
+        android:fitsSystemWindows="true"
         android:theme="@style/Theme.RaphNote.AppBarOverlay">
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/toolbar_layout"
@@ -23,23 +24,25 @@
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/profile"
                 android:layout_width="match_parent"
-                android:layout_marginBottom="@dimen/fab_margin"
-
-                android:layout_height="150dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="?attr/actionBarSize"
                 android:contentDescription="@string/app_name"
-                android:scaleType="fitCenter"
-                android:src="@drawable/a_note_w"  />
+                android:scaleType="fitXY"
+                android:paddingStart="@dimen/fab_margin"
+                android:paddingEnd="@dimen/fab_margin"
+                android:src="@drawable/main_col" />
+
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:layout_collapseMode="parallax"
+                app:layout_collapseMode="pin"
                 app:popupTheme="@style/Theme.RaphNote.PopupOverlay" />
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include  layout="@layout/content_main" />
+    <include layout="@layout/content_main" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_note"

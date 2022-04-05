@@ -4,8 +4,8 @@ package com.softcare.raphnote
 import android.app.SearchManager
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.drawable.AnimationDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -17,7 +17,6 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.softcare.raphnote.databinding.ActivityMainBinding
-import com.softcare.raphnote.db.Schema
 import com.softcare.raphnote.model.ChangeObserver
 
 
@@ -26,21 +25,21 @@ class MainActivity : AppCompatActivity() ,SearchView.OnQueryTextListener
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
-     private val  orderAscending:Boolean
+    val  orderAscending:Boolean
          get(){
              val s: SharedPreferences = this.getSharedPreferences(
                  "RaphNote",
                  MODE_PRIVATE
              )
-           return (s.getInt("orderBy",1)==0)
+           return s.getInt("orderBy",1)==0
          }
-   private val column:String
+  val columnId:Boolean
         get(){
             val s: SharedPreferences = this.getSharedPreferences(
                 "RaphNote",
                 MODE_PRIVATE
             )
-           return  resources.getStringArray(R.array.sort_values)[s.getInt("sortBy",0)]
+           return   s.getInt("sortBy",1)==0
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,6 +47,8 @@ class MainActivity : AppCompatActivity() ,SearchView.OnQueryTextListener
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
+       // (binding.profile.drawable as AnimationDrawable ).start()
+
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -86,14 +87,13 @@ class MainActivity : AppCompatActivity() ,SearchView.OnQueryTextListener
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
-        if(isList ) changeObserver.searchNotes(orderAscending,column ,query)
+        if(isList ) changeObserver.searchNotes(query)
         else changeObserver.searchText(query)
  return true
     }
 
     override fun onQueryTextChange(newText: String?): Boolean {
-        Log.d(Schema().tag, " acc $orderAscending  column $column")
-        if(isList)changeObserver.searchNotes(orderAscending,column ,newText)
+        if(isList)changeObserver.searchNotes(newText)
       else changeObserver.searchText(newText)
         return true
     }

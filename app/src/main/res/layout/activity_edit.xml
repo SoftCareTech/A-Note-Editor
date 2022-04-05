@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
-
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -48,22 +47,27 @@
                 android:contentDescription="@string/back" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-
     </com.google.android.material.appbar.AppBarLayout>
- <ScrollView
-     android:layout_width="match_parent"
-     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-     android:layout_height="match_parent" >
-    <EditText
-        android:id="@+id/text_edit"
+
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:autofillHints="@string/type_here"
-        android:hint="@string/type_here"
-        android:inputType="textMultiLine"
-        android:paddingLeft="@dimen/fab_margin"
-        android:paddingRight="@dimen/fab_margin"
-         />
- </ScrollView>
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|top"
+        android:scrollbarAlwaysDrawVerticalTrack="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <EditText
+            android:id="@+id/text_edit"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:autofillHints="@string/type_here"
+            android:gravity="top"
+            android:hint="@string/type_here"
+            android:inputType="textMultiLine"
+            android:minLines="4"
+            android:paddingStart="@dimen/min"
+            android:paddingEnd="@dimen/min"
+            android:scrollbarAlwaysDrawVerticalTrack="true"
+            android:scrollbarSize="@dimen/min" />
+    </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

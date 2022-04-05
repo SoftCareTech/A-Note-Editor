@@ -17,7 +17,7 @@
     <fragment
         android:id="@+id/NoteViewFragment"
         android:name="com.softcare.raphnote.NoteViewFragment"
-        android:label="View Note"
+        android:label="@string/reading_mode"
         tools:layout="@layout/fragment_note_view">
         <action
             android:id="@+id/action_NoteViewToNoteList"

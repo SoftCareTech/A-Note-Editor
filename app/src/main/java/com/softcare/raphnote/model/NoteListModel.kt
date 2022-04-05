@@ -20,36 +20,16 @@ class NoteListModel(private val repo: Repos) : ViewModel() {
     val noteList: StateFlow<List<Note>> = _noteList
     private val _note = MutableStateFlow<Note>(Note(0,0,""))
     val note: StateFlow<Note> = _note
-    fun getNoteList(ascending: Boolean, orderColumn: String) = viewModelScope.launch {
-        if (ascending)
-            _noteList.value = repo.getAllNotesASC(orderColumn)
-        else
-            _noteList.value = repo.getAllNotesDESC(orderColumn)
+    fun getNotes(ascending: Boolean, orderById: Boolean) = viewModelScope.launch {
+            _noteList.value = repo.getAllNotes(ascending,orderById)
     }
 
-    fun searchNotes(ascending: Boolean, orderColumn: String, query: String) =
+    fun searchNotes(ascending: Boolean, columnId: Boolean, query: String) =
         viewModelScope.launch {
-            if (ascending)
-                _noteList.value = repo.getNotesSearchASC(query, orderColumn)
-            else
-                _noteList.value = repo.getNotesSearchDESC(query, orderColumn)
+                _noteList.value = repo.getNotesSearch(ascending,columnId,query)
         }
 
-    sealed class NoteUiState {
-        object Empty : NoteUiState   ()
-        data class NoteOpened( var note:Note) : NoteUiState   ()
-        object Opening : NoteUiState ()
-        data class FileOpened(val text:String) : NoteUiState ()
-        data class Error(val message: String) : NoteUiState  ()
-        object Deleting : NoteUiState ()
-        object NoteDeleted : NoteUiState ()
-        object Exporting : NoteUiState ()
-        data class Exported(val path:String) : NoteUiState ()
-
-
-
-    }
-    }
+}
 
 class NoteListModelFactory(
     private val repo: Repos

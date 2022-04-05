@@ -1,4 +1,4 @@
-package com.softcare.business.model
+package com.softcare.raphnote.model
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -9,8 +9,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.softcare.raphnote.R
 import com.softcare.raphnote.db.Schema
-import com.softcare.raphnote.model.ClickObserver
-import com.softcare.raphnote.model.Note
 import java.util.*
 
 class NoteAdapter(var context: Context?, var clickObserver: ClickObserver?) :  RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {

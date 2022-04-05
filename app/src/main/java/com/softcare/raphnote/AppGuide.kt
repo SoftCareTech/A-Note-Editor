@@ -2,6 +2,7 @@ package com.softcare.raphnote
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -17,110 +18,107 @@ class AppGuide : AppIntro() {
         // You can use AppIntroFragment to use a pre-built fragment
         addSlide(
             AppIntroFragment.newInstance(
-                imageDrawable = R.drawable.a_note_w_small,
-                title = "Welcome to 'A Note Editor'",
-                description = "You can always come to this guide by selecting" +
-                        " App Guide in options menu of Note List.",
+                imageDrawable = R.drawable.ico_note_w,
+                title = getString(R.string.slide_1_title),
+                description = getString(R.string.slide_1_msg),
                 titleColor = Color.YELLOW,
                 descriptionColor = Color.WHITE,
                 backgroundColor = Color.DKGRAY,
-                        backgroundDrawable = R.drawable.ic_launcher_background
             )
         )
         addSlide(
             AppIntroFragment.newInstance(
-                imageDrawable = R.drawable.a_note_w_small,  // note_list with option menu
-                title = "Notes List (main view)",
-                description = "Click on plus sign  to add note. " +
-                        "Click on a note to  read. " +
-                        "Click on search to search for not that contain the search type word. Click on three vertical dot(Option menu) for more options",
+                imageDrawable = R.drawable.slide_2,
+                title = getString(R.string.slide_2_title),
+                description = getString(R.string.slide_2_msg),
                 titleColor = Color.YELLOW,
                 descriptionColor = Color.WHITE,
                 backgroundColor = Color.MAGENTA
             )
         )
+        addSlide(
+            AppIntroFragment.newInstance(
+                imageDrawable = R.drawable.slide_02,
+                title = getString(R.string.slide_02_title),
+                description =    getString(R.string.slide_02_msg) ,
+                titleColor = Color.YELLOW,
+                descriptionColor = Color.WHITE,
+                backgroundColor = Color.DKGRAY
+            ))
+
 
         addSlide(
         AppIntroFragment.newInstance(
-            imageDrawable = R.drawable.a_note_w_small,
-            title = "Reading mode",
-            description = "Click on pen sign  to edit note. "
-                    +"Search for a word in a note. " +
-                    "Share note as text. "+
-                    "Copy note as text. Export note as text file"+
-                    "Delete note." ,
+            imageDrawable = R.drawable.slide_3,
+            title = getString(R.string.slide_3_title),
+            description = getString(R.string.slide_3_msg) ,
                     titleColor = Color.YELLOW,
             descriptionColor = Color.WHITE,
-            backgroundColor = Color.DKGRAY
+            backgroundColor = Color.MAGENTA
         ))
         addSlide(
+            AppIntroFragment.newInstance(
+                imageDrawable = R.drawable.slide_03,
+                title = getString(R.string.slide_03_title),
+                description = getString(R.string.slide_03_msg) ,
+                titleColor = Color.YELLOW,
+                descriptionColor = Color.WHITE,
+                backgroundColor = Color.DKGRAY
+            ))
+        addSlide(
         AppIntroFragment.newInstance(
-            imageDrawable = R.drawable.a_note_w_small,
-            title = "Editing mode",
-            description = "Click to right check to save and exit editing mode. " +
-                    "Click on a on top left icon to stop editing(you will ask if you want to save changes. ",
+            imageDrawable = R.drawable.slide_4,
+            title = getString(R.string.slide_4_title),
+            description = getString(R.string.slide_4_msg),
             titleColor = Color.YELLOW,
             descriptionColor = Color.WHITE,
             backgroundColor = Color.MAGENTA
         )        )
 
+
         addSlide(
         AppIntroFragment.newInstance(
-            imageDrawable = R.drawable.a_note_w_small,
-            title = "Note List -->options menu",
-            description =    "Share the App link to others. " +
-                    "Open File to open a text file in reading mode."+
-                    "Help is see App guide. "+
-                    "Settings for security, sorting and ordering." ,
+            imageDrawable = R.drawable.ico_note_w,
+            title = getString(R.string.slide_6_title),
+            description = getString(R.string.slide_6_msg),
             titleColor = Color.YELLOW,
             descriptionColor = Color.WHITE,
             backgroundColor = Color.DKGRAY
         ))
-
         addSlide(
         AppIntroFragment.newInstance(
-            imageDrawable = R.drawable.a_note_w_small,
-            title = "Security Setting",
-            description = "Select settings in notes option menu. " +
-                    "Enable security by selecting the enable security. "+
-                    "This will ask for finger print authentication, " +
-                    "pin or pattern on start of note. "  ,
+            imageDrawable = R.drawable.slide_07,
+            title = getString(R.string.slide_7_title),
+            description = getString(R.string.slide_7_msg)  ,
             titleColor = Color.YELLOW,
             descriptionColor = Color.WHITE,
             backgroundColor = Color.MAGENTA
         ))
         addSlide(
-        AppIntroFragment.newInstance(
-            imageDrawable = R.drawable.a_note_w_small,
-            title = "Create note from other apps",
-            description = "Select text in chrome or any ohter app the click share in the app. " +
-                    "List of app will be prompt to you. "+
-                    "Select 'A Note Editor' then it will take you to editing mode " +
-                    "select check to save and continue with your action the other app. Or back if you intender to cancel the operation. "  ,
-            titleColor = Color.YELLOW,
-            descriptionColor = Color.WHITE,
-            backgroundColor = Color.DKGRAY
-        ))
-
-
-
+            AppIntroFragment.newInstance(
+                imageDrawable = R.drawable.slide_7,
+                title = getString(R.string.slide_7_title),
+                description = getString(R.string.slide_7_msg)  ,
+                titleColor = Color.YELLOW,
+                descriptionColor = Color.WHITE,
+                backgroundColor = Color.DKGRAY
+            ))
         addSlide(
             AppIntroFragment.newInstance(
-                imageDrawable = R.drawable.a_note_w_small,
-                title = ".... Let get started",
-                description = "You can always reach us at raphaelraymondproduct@gmail.com." +
-                        "Don't forget to send us feedback at above contact us. "  ,
+                imageDrawable = R.drawable.ico_note_g,
+                title = getString(R.string.slide_8_title),
+                description = getString(R.string.slide_8_msg),
                 titleColor = Color.YELLOW,
                 descriptionColor = Color.WHITE,
                 backgroundColor = Color.MAGENTA
             ))
 
-
-
-
-
+        setTransformer(AppIntroPageTransformerType.Flow)
+        isColorTransitionsEnabled = true
+    }
 /*
 
+//all in on createe method
         addSlide(
             AppIntroFragment.newInstance(
                 title = "The title of your slide",
@@ -145,7 +143,6 @@ class AppGuide : AppIntro() {
 */
        // setTransformer(AppIntroPageTransformerType.Fade)
        // setTransformer(AppIntroPageTransformerType.Zoom)
-        setTransformer(AppIntroPageTransformerType.Flow)
       //  setTransformer(AppIntroPageTransformerType.SlideOver)
      //   setTransformer(AppIntroPageTransformerType.Depth)
 
@@ -157,7 +154,7 @@ class AppGuide : AppIntro() {
             )
         )  */
 
-        isColorTransitionsEnabled = true  //// disable by default
+     //   isColorTransitionsEnabled = true  //// disable by default
 
 
 // Toggle Indicator Visibility                
@@ -182,20 +179,39 @@ You can enable and customize the vibration with:
 isVibrate = true
 vibrateDuration = 50L  */
 
-    }
+
 
 
     override fun onSkipPressed(currentFragment: Fragment?) {
         super.onSkipPressed(currentFragment)
         // Decide what to do when the user clicks on "Skip"
-      //  startActivity(Intent(applicationContext, MainActivity::class.java))
+        val s: SharedPreferences = this.getSharedPreferences(
+            "RaphNote",
+            MODE_PRIVATE
+        )
+        if(s.getBoolean("first",true)){
+            val e=  s.edit()
+            e.putBoolean("first", false)
+            e.apply()
+            e.commit()
+            startActivity(Intent(applicationContext, MainActivity::class.java))
+        }
         finish()
     }
 
     override fun onDonePressed(currentFragment: Fragment?) {
         super.onDonePressed(currentFragment)
-        // Decide what to do when the user clicks on "Done"
-        //startActivity(Intent(applicationContext, MainActivity::class.java))
+        val s: SharedPreferences = this.getSharedPreferences(
+            "RaphNote",
+            MODE_PRIVATE
+        )
+        if(s.getBoolean("first",true)){
+            val e=  s.edit()
+            e.putBoolean("first", false)
+            e.apply()
+            e.commit()
+            startActivity(Intent(applicationContext, MainActivity::class.java))
+        }
         finish()
     }
 }
